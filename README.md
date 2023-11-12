@@ -2,9 +2,11 @@
 
 This is a repository to test an implementation of a genetic algorithm for team matching.
 
-Currently as the fitness function has not been decided upon, Fitness shall temporarily be defined by how close an array is to being sorted in ascending order.
+For now, the actual fitness function containing variables to match people is still being tested. For now this algorithm will judge fitness based on how close an array is to being sorted in ascending order.
+- Fitness = Total sum of array indexes where i = arr\[i\]
 
-The following are some of the settings for the algorithm as detailed by the reference paper (uploaded to Teams)
+The following are some of the settings for the algorithm as detailed by the [reference paper](https://www.sciencedirect.com/science/article/abs/pii/S0950705117304914#sec0013) (also uploaded to Teams)
+
 
 - Generation Gap = 0.9
 - Crossover Operator Probability = 0.9
@@ -12,9 +14,9 @@ The following are some of the settings for the algorithm as detailed by the refe
 
 
 
-# Dev note
+# Developer notes
 
-I took some liberties on certain sections of the algo as the paper did not specify
+I took some liberties on certain sections of the algorithm not specified by the paper
 
 ## Issue 1
 
@@ -51,6 +53,7 @@ Whether or not you should prevent duplicates in your genetic algorithm depends o
 
 In summary, there is no one-size-fits-all answer. It's recommended to experiment and analyze the behavior of your genetic algorithm with and without duplicates to determine the most effective approach for your particular problem.
 
+
 ## Issue 2
 
 Based on the paper
@@ -58,9 +61,9 @@ Based on the paper
 1. Swap mutation is carried out by a probability, which swaps the position of 2 randomly selected indexes in a gene.
 2. Invert mutation on the other hand inverts a subsection of the gene. However the result of this is accepted ONLY IF the result is fitter than the input
 
-The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will say that it does not.
+The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not.
 
-Paper also doesn't specify whether Invert mutation occurs on a probability, though this can be assumed to be yes.
+Paper also doesn't specify whether Invert mutation occurs on a probability, but this is easily assumed to be yes.
 
 ### Chatgpt ans:
 
