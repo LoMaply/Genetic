@@ -1,9 +1,6 @@
 package model;
 
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
 
@@ -19,14 +16,7 @@ public class Gene {
     public Gene(int length) {
         this.gene = shuffleArray(length);
         this.length = length;
-
-        int fitness = 1;
-        for (int i = 1; i < length; i++) {
-            if (gene[i] > gene[i - 1]) {
-                fitness++;
-            }
-        }
-        this.fitness = fitness;
+        this.fitness = calculateFitness(gene);
     }
 
     /**
@@ -35,13 +25,20 @@ public class Gene {
     public Gene(int[] gene, int length) {
         this.gene = gene;
         this.length = length;
+        this.fitness = calculateFitness(gene);
+    }
+
+    /**
+     * Placeholder fitness calculation function for prototype algorithm.
+     */
+    public static int calculateFitness(int[] gene) {
         int fitness = 1;
-        for (int i = 1; i < length; i++) {
-            if (gene[i] > gene[i - 1]) {
+        for (int i = 0; i < gene.length; i++) {
+            if (gene[i] == i) {
                 fitness++;
             }
         }
-        this.fitness = fitness;
+        return fitness;
     }
 
     /**
@@ -85,14 +82,31 @@ public class Gene {
     /**
      * Performs swap mutation.
      */
-    public void mutateSwap(int random1, int random2) {
+    public Gene mutateSwap(int random1, int random2) {
         int temp = gene[random1];
         gene[random1] = gene[random2];
         gene[random2] = temp;
+        return this;
     }
 
-    public void mutateInvert() {
+    /**
+     * Performs invert mutation, with condition to only apply when result is fitter than input.
+     */
+    public Gene invert(int random1, int random2) {
+        int left = Math.min(random1, random2);
+        int right = Math.max(random1, random2);
 
+        int[] result = Arrays.copyOf(this.gene, this.length);
+
+        while (left < right) {
+            int temp = result[left];
+            result[left] = result[right];
+            result[right] = temp;
+
+            left++;
+            right--;
+        }
+        return (calculateFitness(result) > calculateFitness(this.gene)) ? new Gene(result, this.length) : this;
     }
 
     /**

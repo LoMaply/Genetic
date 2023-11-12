@@ -1,5 +1,7 @@
 package model;
 
+import utils.GeneComparator;
+
 import java.util.ArrayList;
 
 public class Population {
@@ -33,6 +35,14 @@ public class Population {
     }
 
     /**
+     * Returns {@param no} fittest genes from the current population as an ArrayList.
+     */
+    public ArrayList<Gene> getFittestGenes(int no) {
+        genes.sort(new GeneComparator());
+        return new ArrayList<>(genes.subList(0, no));
+    }
+
+    /**
      * Updates population with new set of genes (for new generations).
      */
     public void updateGenes(ArrayList<Gene> genes) {
@@ -50,6 +60,13 @@ public class Population {
             System.out.println(i + ") " + curr.toString());
             System.out.println("Fitness = " + curr.getFitness());
         }
+        System.out.print("Total Fitness = " + getTotalFitness() + "\n");
+    }
+
+    /**
+     * Only print total fitness of current population.
+     */
+    public void printTotalFitness() {
         System.out.print("Total Fitness = " + getTotalFitness() + "\n");
     }
 }

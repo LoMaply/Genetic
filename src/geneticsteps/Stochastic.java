@@ -25,9 +25,13 @@ public class Stochastic {
                 cumulativeProbability += gene.getFitness();
                 while (cumulativeProbability > pointer) {
 
+                    selectedGenes.add(gene);
+
+                    /*
                     if (!selectedGenes.contains(gene)) { // Ensures each gene only chosen once
                         selectedGenes.add(gene);
                     }
+                    */
                     pointer += spacing;
                 }
             }
