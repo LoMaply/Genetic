@@ -27,8 +27,12 @@ public class Stochastic {
 
                     selectedGenes.add(gene);
 
+                    // At first I had this condition to prevent the same gene from being chosen multiple times
+                    // But it led to a near infinite loop in some cases
+                    // Still seems to work even when removing this condition
+
                     /*
-                    if (!selectedGenes.contains(gene)) { // Ensures each gene only chosen once
+                    if (!selectedGenes.contains(gene)) {
                         selectedGenes.add(gene);
                     }
                     */
