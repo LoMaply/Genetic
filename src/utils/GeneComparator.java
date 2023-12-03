@@ -1,6 +1,6 @@
 package utils;
 
-import model.Gene;
+import geneticsteps.Gene;
 
 import java.util.Comparator;
 

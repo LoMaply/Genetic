@@ -59,16 +59,9 @@ In summary, there is no one-size-fits-all answer. It's recommended to experiment
 Based on the paper
 
 1. Swap mutation is carried out by a probability, which swaps the position of 2 randomly selected indexes in a gene.
-2. Invert mutation on the other hand inverts a subsection of the gene. However the result of this is accepted ONLY IF the result is fitter than the input
+2. Invert mutation on the other hand inverts a subsection of the gene. However, the result of this is accepted ONLY IF the result is fitter than the input
 
 The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not.
 
-Paper also doesn't specify whether Invert mutation occurs on a probability, but this is easily assumed to be yes.
+Paper also doesn't specify whether Invert mutation occurs on a probability, but this is assumed to be yes.
 
-### Chatgpt ans:
-
-I see, thank you for clarifying. In the description provided, there isn't explicit information about a fitness-based criterion for the acceptance of offspring resulting from the Swap Mutation, as mentioned in the context of the Inversion Mutation.
-
-However, it's common for the Swap Mutation, like other mutation operators, to be subject to a fitness criterion. The goal is to ensure that the mutation contributes positively to the population by only accepting mutated individuals that are at least as fit as their parents. This helps avoid introducing detrimental changes that could harm the overall quality of the population.
-
-In practice, the decision to accept or reject mutated individuals based on fitness is a design choice and can vary between different implementations of genetic algorithms. It's not uncommon for practitioners to apply a fitness criterion to mutation operations to maintain or improve the quality of solutions in the population. If the provided paper doesn't explicitly mention such a criterion for the Swap Mutation, you may want to review the specific details or consider consulting the authors if possible.
