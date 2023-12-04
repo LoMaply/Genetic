@@ -12,7 +12,7 @@ public class Population {
     /**
      * Creates a population containing {@param size} genes, each of length {@param geneLength}.
      */
-    public Population(int geneLength, int size) {
+    private Population(int geneLength, int size) {
         this.genes = new ArrayList<>(size);
         this.count = size;
         for (int i = 0; i < size; i++) {
@@ -21,10 +21,18 @@ public class Population {
     }
 
     /**
+     * Creates a base gene and generates initial population by randomly permutating it.
+     */
+    public static Population initialise(int geneLength, int geneCount, int groupNo) {
+        Gene.setBaseGene(geneLength, groupNo);
+        return new Population(geneLength, geneCount);
+    }
+
+    /**
      * Returns total fitness of population.
      */
-    public int getTotalFitness() {
-        return genes.stream().map(Gene::getFitness).reduce(0, Integer::sum);
+    public double getTotalFitness() {
+        return genes.stream().map(Gene::getFitness).reduce(0.0, Double::sum);
     }
 
     /**

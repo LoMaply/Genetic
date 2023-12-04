@@ -11,9 +11,10 @@ import java.util.Random;
 public class Main {
 
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
-    public static int GENE_LENGTH = 20; // Length of each gene, populates Gene with numbers from 1 to n.
-    public static int GENERATION_COUNT = 250; // Max no. of generations.
-    public static int FITNESS_LIMIT = 1000; // Minimum fitness goal to end.
+    public static int GENE_LENGTH = 30; // No. of Person objects in each gene.
+    public static int GROUP_NUMBER = 6; // No. of equal sized groups to split Person objects into.
+    public static int GENERATION_COUNT = 250; // Max no. of generations to run.
+    public static int FITNESS_LIMIT = 5; // Minimum fitness for stopping algo.
     public static double GENERATION_GAP = 0.9; // Ratio of parent population to child population, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -33,7 +34,7 @@ public class Main {
         Random random = new Random();
 
         // Create population, geneLength and size must be > 1 at all times, I won't bother with error checking.
-        Population population = new Population(GENE_LENGTH, POPULATION_SIZE);
+        Population population = Population.initialise(GENE_LENGTH, POPULATION_SIZE, GROUP_NUMBER);
         population.printPopulation();
         System.out.println("\n");
 

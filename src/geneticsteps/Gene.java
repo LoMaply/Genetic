@@ -1,24 +1,27 @@
 package geneticsteps;
 
+import model.Person;
+import model.Weight;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
 
 public class Gene {
 
-    private final int[] gene;
-    private final int fitness;
+    public static List<Person> baseGene;
+    public static int[] groupIndex;
+    private final Person[] gene;
+    private final double fitness;
     private final int length;
 
     /**
      * Constructor for Gene, only called when the initial population is being built.
      */
     public Gene(int length) {
-        this.gene = shuffleArray(length);
+        this.gene = getShuffledBase();
         this.length = length;
         this.fitness = calculateFitness(gene);
     }
@@ -26,46 +29,86 @@ public class Gene {
     /**
      * Overloaded constructor for Gene, called when generating child genes during Crossover.
      */
-    public Gene(int[] gene, int length) {
+    public Gene(Person[] gene, int length) {
         this.gene = gene;
         this.length = length;
         this.fitness = calculateFitness(gene);
     }
 
     /**
-     * Placeholder fitness calculation function for prototype algorithm.
+     * Creates an array of Person objects, to be used for generating random permutations for initial population.
+     * @param geneLength No. of Person objects in each gene.
+     * @param groupNo No. of equal sized groups to form.
      */
-    public static int calculateFitness(int[] gene) {
-        int fitness = 1;
-        for (int i = 0; i < gene.length; i++) {
-            if (gene[i] == i) { // Change this definition
-                fitness++;
+    public static void setBaseGene(int geneLength, int groupNo) {
+        baseGene = Arrays.asList(Person.createPeople(geneLength));
+
+        // Stores 1st index of each group in groupIndex.
+        groupIndex = new int[groupNo];
+        int index = 0;
+        int standard = geneLength / groupNo;
+        if (geneLength % groupNo == 0) { // No remainder
+            for (int i = 0; i < groupNo; i++) {
+                groupIndex[i] = index;
+                index += standard;
+            }
+        } else { // Remainder split evenly to groups starting from back
+            int zp = groupNo - (geneLength % groupNo);
+            for (int i = 0; i < groupNo; i++) {
+                groupIndex[i] = index;
+                index += standard;
+                if (i >= zp) {
+                    index++;
+                }
             }
         }
-        return fitness;
     }
 
     /**
-     * Returns a randomly shuffled array containing numbers 1 to {@param size}.
-     * Used to create a randomised gene at the start.
+     * Returns a shuffled copy of the baseGene.
      */
-    public static int[] shuffleArray(int size) {
-        List<Integer> gene = IntStream.range(0, size).boxed().collect(Collectors.toList());
-        Collections.shuffle(gene);
-        return gene.stream().mapToInt(i -> i).toArray();
+    public static Person[] getShuffledBase() {
+        Collections.shuffle(baseGene);
+        return baseGene.toArray(Person[]::new);
+    }
+
+    /**
+     * WIP fitness calculation function for prototype algorithm.
+     * Currently only considers Homogeneous and Heterogeneous charateristics.
+     */
+    public static double calculateFitness(Person[] gene) {
+        double heteroTotal = 0;
+        double homoTotal = 0;
+        // For each group based on groupIndex
+        for (int i = 0; i < groupIndex.length; i++) {
+            // Index of first group member
+            int firstMem = groupIndex[i];
+            // Index of last group member + 1
+            int lastMemEx = i < groupIndex.length - 1 ? groupIndex[i + 1] : gene.length;
+
+            // For each possible pair in group, compute Similarity and add to total.
+            for (int j = firstMem; j < lastMemEx - 1; j++) {
+                for (int k = j + 1; k < lastMemEx; k++) {
+                    heteroTotal += gene[j].calcSimilarity(gene[k]);
+                    homoTotal += gene[j].calcDifference(gene[k]);
+                }
+            }
+        }
+
+        return 1 / ((Weight.WEIGHT_HETEROGENEOUS) * heteroTotal + (Weight.WEIGHT_HOMOGENEOUS) * homoTotal);
     }
 
     /**
      * Crossover operation to create children.
      */
     public Gene crossParent(Gene parent2, int start, int end) {
-        int[] child = new int[this.length];
+        Person[] child = new Person[this.length];
 
         // Copies selected portion from parent1 to child
         System.arraycopy(this.gene, start, child, start, end - start + 1);
 
         // Create map between values of selected portion
-        Map<Integer, Integer> mapping = new HashMap<>();
+        Map<Person, Person> mapping = new HashMap<>();
         for (int i = start; i <= end; i++) {
             mapping.put(this.gene[i], parent2.gene[i]);
         }
@@ -73,7 +116,7 @@ public class Gene {
         // Validates child
         for (int i = 0; i < this.length; i++) {
             if (i < start || i > end) {
-                int value = parent2.gene[i];
+                Person value = parent2.gene[i];
                 while (mapping.containsKey(value)) {
                     value = mapping.get(value);
                 }
@@ -87,7 +130,7 @@ public class Gene {
      * Performs swap mutation.
      */
     public Gene mutateSwap(int random1, int random2) {
-        int temp = gene[random1];
+        Person temp = gene[random1];
         gene[random1] = gene[random2];
         gene[random2] = temp;
         return this;
@@ -100,13 +143,12 @@ public class Gene {
         int left = Math.min(random1, random2);
         int right = Math.max(random1, random2);
 
-        int[] result = Arrays.copyOf(this.gene, this.length);
+        Person[] result = Arrays.copyOf(this.gene, this.length);
 
         while (left < right) {
-            int temp = result[left];
+            Person temp = result[left];
             result[left] = result[right];
             result[right] = temp;
-
             left++;
             right--;
         }
@@ -116,7 +158,7 @@ public class Gene {
     /**
      * Returns fitness of Gene.
      */
-    public int getFitness() {
+    public double getFitness() {
         return this.fitness;
     }
 

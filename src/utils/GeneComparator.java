@@ -11,6 +11,8 @@ public class GeneComparator implements Comparator<Gene> {
 
     @Override
     public int compare(Gene g1, Gene g2) {
-        return g2.getFitness() - g1.getFitness();
+        // Temporary solution as fitness is a double
+        double result = g2.getFitness() - g1.getFitness();
+        return result == 0 ? 0 : (result < 0 ? -1 : 1);
     }
 }
