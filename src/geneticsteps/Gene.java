@@ -75,6 +75,8 @@ public class Gene {
     /**
      * WIP fitness calculation function for prototype algorithm.
      * Currently only considers Homogeneous and Heterogeneous charateristics.
+     * @param gene Person array to calculate fitness for.
+     * @return Fitness value as a double.
      */
     public static double calculateFitness(Person[] gene) {
         double heteroTotal = 0;
@@ -99,7 +101,8 @@ public class Gene {
     }
 
     /**
-     * Crossover operation to create children.
+     * Crossover operation to create children using randomly generated indexes {@param start} and {@param end}.
+     * @param parent2 Second parent to Crossover with.
      */
     public Gene crossParent(Gene parent2, int start, int end) {
         Person[] child = new Person[this.length];
@@ -127,7 +130,7 @@ public class Gene {
     }
 
     /**
-     * Performs swap mutation.
+     * Performs swap mutation using randomly generated indexes {@param start} and {@param end}.
      */
     public Gene mutateSwap(int random1, int random2) {
         Person temp = gene[random1];
@@ -138,6 +141,7 @@ public class Gene {
 
     /**
      * Performs invert mutation, with condition to only apply when result is fitter than input.
+     * Uses randomly generated indexes {@param start} and {@param end}.
      */
     public Gene mutateInvert(int random1, int random2) {
         int left = Math.min(random1, random2);

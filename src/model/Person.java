@@ -20,7 +20,7 @@ public class Person {
     }
 
     /**
-     * Creates a {@code length} randomly generated People objects.
+     * Creates {@param length} randomly generated People objects.
      * @return People objects returned as an array.
      */
     public static Person[] createPeople(int length) {
