@@ -1,22 +1,23 @@
 package model;
 
+import java.util.Arrays;
 import java.util.Random;
 
 public class Person {
     private static int global = 0;
-    private int id;
-    private double[] heterogeneous;
-    private double[] homogeneous;
+    private final int id;
+    private final double[] heterogeneous;
+    private final double[] homogeneous;
 
     /**
-     * Creates a Person with random characteristics.
-     * Each characteristic group contains 2 characteristics, each with a value of 0 < x < 1.
+     * Creates a Person with random characteristics. Will allow for non-random characteristics in the future.
+     * No. of characteristics from each group depends on Weight class.
      */
     private Person() {
         Random random = new Random();
         this.id = global++;
-        this.heterogeneous = new double[]{ random.nextFloat(), random.nextFloat(), random.nextFloat() };
-        this.homogeneous = new double[]{ random.nextFloat(), random.nextFloat(), random.nextFloat() };
+        this.heterogeneous = Arrays.stream(new double[Weight.heteroWeights.length]).map(x -> random.nextFloat()).toArray();
+        this.homogeneous = Arrays.stream(new double[Weight.homoWeights.length]).map(x -> random.nextFloat()).toArray();
     }
 
     /**
@@ -37,6 +38,14 @@ public class Person {
         // return this.id + "\n" + Arrays.toString(heterogeneous);
     }
 
+    public double[] getHeterogeneous() {
+        return heterogeneous;
+    }
+
+    public double[] getHomogeneous() {
+        return homogeneous;
+    }
+
     /**
      * Calculates similarity for 2 Person objects based on Heterogeneous characteristics.
      * @param groupMate 2nd Person object to be calculated with.
@@ -44,10 +53,9 @@ public class Person {
      */
     public double calcSimilarity(Person groupMate) {
         double[] first = this.heterogeneous;
-        double[] second = groupMate.heterogeneous;
         double similaritySum = 0;
         for (int i = 0; i < first.length; i++) {
-            similaritySum += Weight.heteroWeights[i] * Math.abs(first[i] - second[i]);
+            similaritySum += Weight.heteroWeights[i] * Math.abs(first[i] - groupMate.heterogeneous[i]);
         }
         return similaritySum / Weight.heteroWeightSum;
     }
@@ -59,10 +67,9 @@ public class Person {
      */
     public double calcDifference(Person groupMate) {
         double[] first = this.homogeneous;
-        double[] second = groupMate.homogeneous;
         double differenceSum = 0;
         for (int i = 0; i < first.length; i++) {
-            differenceSum += Weight.homoWeights[i] * Math.abs(first[i] - second[i]);
+            differenceSum += Weight.homoWeights[i] * Math.abs(first[i] - groupMate.homogeneous[i]);
         }
         return 1 - (differenceSum / Weight.homoWeightSum);
     }

@@ -65,7 +65,7 @@ public class Population {
     public void printPopulation() {
         for (int i = 0; i < count; i++) {
             Gene curr = genes.get(i);
-            System.out.println(i + ") " + curr.toString());
+            System.out.println((i + 1) + ") " + curr.toString());
             System.out.println("Fitness = " + curr.getFitness());
         }
         System.out.print("Total Fitness = " + getTotalFitness() + "\n");

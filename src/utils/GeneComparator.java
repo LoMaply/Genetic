@@ -5,7 +5,8 @@ import geneticsteps.Gene;
 import java.util.Comparator;
 
 /**
- * Class to sort Population gene field, based on individual gene fitness, in ascending order. Used only in method for finding fittest n genes.
+ * Sort Population by individual gene fitness, in descending order.
+ * Used to find n fittest genes by taking first n elements of sorted population.
  */
 public class GeneComparator implements Comparator<Gene> {
 

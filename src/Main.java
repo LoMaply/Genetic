@@ -13,8 +13,8 @@ public class Main {
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
     public static int GENE_LENGTH = 30; // No. of Person objects in each gene.
     public static int GROUP_NUMBER = 6; // No. of equal sized groups to split Person objects into.
-    public static int GENERATION_COUNT = 250; // Max no. of generations to run.
-    public static int FITNESS_LIMIT = 5; // Minimum fitness for stopping algo.
+    public static int GENERATION_COUNT = 500; // Max no. of generations to run.
+    public static int FITNESS_LIMIT = 1000; // Minimum fitness for stopping algo.
     public static double GENERATION_GAP = 0.9; // Ratio of parent population to child population, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -69,7 +69,7 @@ public class Main {
                 }
             }
 
-            // Elitism (Move parents with highest fitness to new population)
+            // Elitism (Create new population using children + fittest parents)
             ArrayList<Gene> childrenPopulation = population.getFittestGenes(POPULATION_SIZE - OFFSPRING_COUNT);
             childrenPopulation.addAll(selectedGenes);
             population.updateGenes(childrenPopulation);
@@ -82,5 +82,6 @@ public class Main {
         }
 
         population.printPopulation();
+        population.getFittestGenes(1).get(0).printAsGroup();
     }
 }
