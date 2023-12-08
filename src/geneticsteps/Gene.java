@@ -8,6 +8,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 
 public class Gene {
 
@@ -44,10 +45,10 @@ public class Gene {
      * @param geneLength No. of Person objects in each gene.
      * @param groupNo No. of equal sized groups to form.
      */
-    public static void setBaseGene(int geneLength, int groupNo) {
-        baseGene = Arrays.asList(Person.createPeople(geneLength));
+    public static void setBaseGene(int geneLength, int groupNo, Person[] customGene) {
+        baseGene = Arrays.asList(Objects.requireNonNullElseGet(customGene, () -> Person.createPeople(geneLength)));
 
-        // Store total mean of each characteristic individually (for fBal)
+        // Store total mean of each characteristic individually (for calculating fBal).
         meanHetero = new double[Weight.HETERO_TOTAL_COUNT];
         meanHomo = new double[Weight.HOMO_TOTAL_COUNT];
 
@@ -62,7 +63,7 @@ public class Gene {
             }
         });
 
-        // Stores index of 1st member of each group in groupIndex.
+        // Stores index of 1st member of each group in groupIndex (for group based calculations).
         groupIndex = new int[groupNo];
         int index = 0;
         int standard = geneLength / groupNo;
@@ -101,6 +102,7 @@ public class Gene {
         double fHetero = 0;
         double fHomo = 0;
         double fBal = 0;
+        double fPref = 0;
 
         // For each group.
         for (int i = 0; i < groupIndex.length; i++) {
@@ -112,12 +114,14 @@ public class Gene {
             // Index of last group member
             int lastMem = i < groupIndex.length - 1 ? groupIndex[i + 1] - 1 : gene.length - 1;
 
-            // For each possible pair in group.
+            // For each possible pair in current group.
             for (int j = firstMem; j < lastMem; j++) {
                 for (int k = j + 1; k <= lastMem; k++) {
                     // fHetero and fHomo to calculate fMix
                     fHetero += gene[j].calcSimilarity(gene[k]);
                     fHomo += gene[j].calcDifference(gene[k]);
+
+                    fPref += Person.isPreferred(gene[j], gene[k]);
                 }
             }
 
@@ -147,9 +151,10 @@ public class Gene {
             }
         }
 
-        double fMix = 1 / ((Weight.WEIGHT_HETEROGENEOUS) * fHetero + (Weight.WEIGHT_HOMOGENEOUS) * fHomo);
+        double fMix = (Weight.WEIGHT_HETEROGENEOUS) * fHetero + (Weight.WEIGHT_HOMOGENEOUS) * fHomo;
 
-        return (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE) / Weight.F_TEMP;
+        return (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE + fPref * Weight.WEIGHT_PREFERENCE) / Weight.F_TEMP;
+        // return (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE) / Weight.WEIGHT_MIX + Weight.WEIGHT_BALANCE;
         // return fMix;
     }
 
@@ -190,6 +195,16 @@ public class Gene {
         gene[random1] = gene[random2];
         gene[random2] = temp;
         return this;
+
+        /*
+        Person[] result = Arrays.copyOf(this.gene, this.length);
+
+        Person temp = result[random1];
+        result[random1] = result[random2];
+        result[random2] = temp;
+        return (calculateFitness(result) > this.getFitness()) ? new Gene(result, this.length) : this;
+
+         */
     }
 
     /**

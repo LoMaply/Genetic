@@ -1,5 +1,6 @@
 package geneticsteps;
 
+import model.Person;
 import utils.GeneComparator;
 
 import java.util.ArrayList;
@@ -23,8 +24,8 @@ public class Population {
     /**
      * Creates a base gene and generates initial population by randomly permutating it.
      */
-    public static Population initialise(int geneLength, int geneCount, int groupNo) {
-        Gene.setBaseGene(geneLength, groupNo);
+    public static Population initialise(int geneLength, int geneCount, int groupNo, Person[] customGene) {
+        Gene.setBaseGene(geneLength, groupNo, customGene);
         return new Population(geneLength, geneCount);
     }
 
