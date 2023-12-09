@@ -1,24 +1,37 @@
 package geneticsteps;
 
+import model.Person;
+import model.Weight;
+
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.stream.Collectors;
-import java.util.stream.IntStream;
+import java.util.Objects;
 
 public class Gene {
 
-    private final int[] gene;
-    private final int fitness;
+    // Class fields to be set before genetic algorithm can proceed.
+    private static List<Person> baseGene;
+    private static double[] meanHetero; // Mean of each heterogeneous characteristic of all Persons in gene.
+    private static double[] meanHomo; // Mean of each homogeneous characteristic of all Persons in gene.
+    private static int[] groupIndex; // Starting index of each group in gene.
+    public static HashSet<Integer> aggregatedPersons = new HashSet<>(); // Ids of Persons to be grouped together.
+    public static HashSet<Integer> distributedPersons = new HashSet<>(); // Ids of Persons to be separated.
+
+
+    // Fields for Gene instance.
+    private final Person[] gene;
+    private final double fitness; // Total fitness of gene.
     private final int length;
 
     /**
      * Constructor for Gene, only called when the initial population is being built.
      */
     public Gene(int length) {
-        this.gene = shuffleArray(length);
+        this.gene = getShuffledBase();
         this.length = length;
         this.fitness = calculateFitness(gene);
     }
@@ -26,46 +39,154 @@ public class Gene {
     /**
      * Overloaded constructor for Gene, called when generating child genes during Crossover.
      */
-    public Gene(int[] gene, int length) {
+    public Gene(Person[] gene, int length) {
         this.gene = gene;
         this.length = length;
         this.fitness = calculateFitness(gene);
     }
 
     /**
-     * Placeholder fitness calculation function for prototype algorithm.
+     * Creates base array of Person objects, to be used for generating random permutations for initial population.
+     * Stores information related to baseGene, useful for some calculations.
+     * @param geneLength No. of Person objects to randomly generate OR length of non-null {@param customGene}.
+     * @param groupNo No. of equal sized groups to form.
+     * @param customGene Optional customGene to be used instead of randomly generated baseGene.
+     * @param aggregate Array of Ids of Persons to group together.
+     * @param distribute Array of Ids of Persons to separate.
      */
-    public static int calculateFitness(int[] gene) {
-        int fitness = 1;
-        for (int i = 0; i < gene.length; i++) {
-            if (gene[i] == i) { // Change this definition
-                fitness++;
+    public static void setBaseInfo(int geneLength, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
+
+        // Set baseGene used to generate initial population. Creates random base gene when null argument provided
+        baseGene = Arrays.asList(Objects.requireNonNullElseGet(customGene, () -> Person.createPeople(geneLength)));
+
+        // Store Ids of aggregated/distributed Persons into respective HashSet (for calculating fDist).
+        for (int person : aggregate) {
+            aggregatedPersons.add(person);
+        }
+        for (int person : distribute) {
+            distributedPersons.add(person);
+        }
+
+        // Store total mean of each characteristic individually (for calculating fBal).
+        meanHetero = new double[Weight.HETERO_TOTAL_COUNT];
+        meanHomo = new double[Weight.HOMO_TOTAL_COUNT];
+
+        baseGene.forEach(x -> {
+            double[] hetero = x.getHeterogeneous();
+            double[] homo = x.getHomogeneous();
+            for (int i = 0; i < Weight.HETERO_TOTAL_COUNT; i++) {
+                meanHetero[i] += (hetero[i] / geneLength);
+            }
+            for (int i = 0; i < Weight.HOMO_TOTAL_COUNT; i++) {
+                meanHomo[i] += (homo[i] / geneLength);
+            }
+        });
+
+        // Store index of 1st member of each group in groupIndex (for group based calculations).
+        groupIndex = new int[groupNo];
+        int index = 0;
+        int standard = geneLength / groupNo;
+        if (geneLength % groupNo == 0) { // No remainder
+            for (int i = 0; i < groupNo; i++) {
+                groupIndex[i] = index;
+                index += standard;
+            }
+        } else { // Remainder split evenly to groups starting from back
+            int zp = groupNo - (geneLength % groupNo);
+            for (int i = 0; i < groupNo; i++) {
+                groupIndex[i] = index;
+                index += standard;
+                if (i >= zp) {
+                    index++;
+                }
             }
         }
-        return fitness;
     }
 
     /**
-     * Returns a randomly shuffled array containing numbers 1 to {@param size}.
-     * Used to create a randomised gene at the start.
+     * Returns a random permutation of baseGene for generating initial population.
      */
-    public static int[] shuffleArray(int size) {
-        List<Integer> gene = IntStream.range(0, size).boxed().collect(Collectors.toList());
-        Collections.shuffle(gene);
-        return gene.stream().mapToInt(i -> i).toArray();
+    public static Person[] getShuffledBase() {
+        Collections.shuffle(baseGene);
+        return baseGene.toArray(Person[]::new);
     }
 
     /**
-     * Crossover operation to create children.
+     * Calculates fitness of gene based on several F values as detailed in reference paper.
+     * @param gene Person array to calculate fitness for.
+     * @return Fitness value as a double.
+     */
+    public static double calculateFitness(Person[] gene) {
+        double fHetero = 0;
+        double fHomo = 0;
+        double fBal = 0;
+        double fPref = 0;
+        double fDist = 0;
+
+        // For each group.
+        for (int i = 0; i < groupIndex.length; i++) {
+
+            // Index of first group member
+            int firstMem = groupIndex[i];
+            // Index of last group member
+            int lastMem = i < groupIndex.length - 1 ? groupIndex[i + 1] - 1 : gene.length - 1;
+
+            // For each possible pair in current group.
+            for (int j = firstMem; j < lastMem; j++) {
+                for (int k = j + 1; k <= lastMem; k++) {
+                    // fHetero and fHomo to calculate fMix
+                    fHetero += Person.calcSimilarity(gene[j], gene[k]);
+                    fHomo += Person.calcDifference(gene[j], gene[k]);
+
+                    fPref += Person.calcPreferred(gene[j], gene[k]);
+                    fDist += Person.calcDistribution(gene[j], gene[k]);
+                }
+            }
+
+            // For fBal.
+
+            double[] groupMeanHetero = new double[lastMem - firstMem + 1];
+            double[] groupMeanHomo = new double[lastMem - firstMem + 1];
+
+            // Calculate mean char of all members of current group.
+            for (int j = firstMem; j <= lastMem; j++) {
+                double[] hetero = gene[j].getHeterogeneous();
+                double[] homo = gene[j].getHomogeneous();
+
+                for (int k = 0; k < Weight.HETERO_TOTAL_COUNT; k++) {
+                    groupMeanHetero[k] += (hetero[k] / gene.length);
+                }
+                for (int k = 0; k < Weight.HOMO_TOTAL_COUNT; k++) {
+                    groupMeanHomo[k] += (homo[k] / gene.length);
+                }
+            }
+            // Summing up for fBal.
+            for (int j = 0; j < Weight.HETERO_TOTAL_COUNT; j++) {
+                fBal += Math.pow(groupMeanHetero[j] - meanHetero[j], 2);
+            }
+            for (int j = 0; j < Weight.HOMO_TOTAL_COUNT; j++) {
+                fBal += Math.pow(groupMeanHomo[j] - meanHomo[j], 2);
+            }
+        }
+
+        double fMix = fHetero * Weight.WEIGHT_HETEROGENEOUS + fHomo * Weight.WEIGHT_HOMOGENEOUS;
+
+        // Fitness = 1 / F, hence the inversion of numerator & denominator.
+        return Weight.F_TOTAL_WEIGHT / (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE + fPref * Weight.WEIGHT_PREFERENCE + fDist * Weight.WEIGHT_DISTRIBUTION);
+    }
+
+    /**
+     * Crossover operation to create children using randomly generated indexes {@param start} and {@param end}.
+     * @param parent2 Second parent to Crossover with.
      */
     public Gene crossParent(Gene parent2, int start, int end) {
-        int[] child = new int[this.length];
+        Person[] child = new Person[this.length];
 
         // Copies selected portion from parent1 to child
         System.arraycopy(this.gene, start, child, start, end - start + 1);
 
         // Create map between values of selected portion
-        Map<Integer, Integer> mapping = new HashMap<>();
+        Map<Person, Person> mapping = new HashMap<>();
         for (int i = start; i <= end; i++) {
             mapping.put(this.gene[i], parent2.gene[i]);
         }
@@ -73,7 +194,7 @@ public class Gene {
         // Validates child
         for (int i = 0; i < this.length; i++) {
             if (i < start || i > end) {
-                int value = parent2.gene[i];
+                Person value = parent2.gene[i];
                 while (mapping.containsKey(value)) {
                     value = mapping.get(value);
                 }
@@ -84,39 +205,50 @@ public class Gene {
     }
 
     /**
-     * Performs swap mutation.
+     * Performs swap mutation using randomly generated indexes {@param start} and {@param end}.
      */
     public Gene mutateSwap(int random1, int random2) {
-        int temp = gene[random1];
+        Person temp = gene[random1];
         gene[random1] = gene[random2];
         gene[random2] = temp;
         return this;
+
+        // Alternate implementation with condition to apply when result fitter than input, for testing.
+
+        /*
+        Person[] result = Arrays.copyOf(this.gene, this.length);
+
+        Person temp = result[random1];
+        result[random1] = result[random2];
+        result[random2] = temp;
+        return (calculateFitness(result) > this.getFitness()) ? new Gene(result, this.length) : this;
+         */
     }
 
     /**
      * Performs invert mutation, with condition to only apply when result is fitter than input.
+     * Uses randomly generated indexes {@param start} and {@param end}.
      */
     public Gene mutateInvert(int random1, int random2) {
         int left = Math.min(random1, random2);
         int right = Math.max(random1, random2);
 
-        int[] result = Arrays.copyOf(this.gene, this.length);
+        Person[] result = Arrays.copyOf(this.gene, this.length);
 
         while (left < right) {
-            int temp = result[left];
+            Person temp = result[left];
             result[left] = result[right];
             result[right] = temp;
-
             left++;
             right--;
         }
-        return (calculateFitness(result) > calculateFitness(this.gene)) ? new Gene(result, this.length) : this;
+        return (calculateFitness(result) > this.getFitness()) ? new Gene(result, this.length) : this;
     }
 
     /**
      * Returns fitness of Gene.
      */
-    public int getFitness() {
+    public double getFitness() {
         return this.fitness;
     }
 
@@ -127,5 +259,21 @@ public class Gene {
             result.append(gene[i]).append(" ");
         }
         return result.toString();
+    }
+
+    /**
+     * Prints gene where all elements are in their respective groups (denoted by a new line).
+     */
+    public void printAsGroup() {
+        System.out.println("Fitness: " + this.fitness);
+        for (int i = 0; i < groupIndex.length; i++) {
+            int firstMem = groupIndex[i];
+            int lastMem = i < groupIndex.length - 1 ? groupIndex[i + 1] - 1 : gene.length - 1;
+            StringBuilder group = new StringBuilder();
+            for (int j = firstMem; j <= lastMem; j++) {
+                group.append(gene[j]).append(" ");
+            }
+            System.out.println((i + 1) + ": " + group);
+        }
     }
 }

@@ -13,6 +13,27 @@ The following are some of the settings for the algorithm as detailed by the [ref
 - Mutation Operator Probability = 0.09
 
 
+# Usage
+
+Simply run `Main`. Several settings to take note of below:
+
+There are 2 main classes where the user can change the algorithm settings as follows:
+1. Weight.java - Allows user to modify the weights of various groups, which impacts the calculated Fitness of a particular Gene.
+2. Main.java - Allows user to modify the various probability chances, generation count, population count, gene size etc.
+
+To start off, first set the `FITNESS_LIMIT` in Main.java to a high value. This is due to the behaviour of the algorithm where throughout each generation, Population Fitness increases to a maximum before decreasing slightly and staying at a roughly even level.
+
+As such, `FITNESS_LIMIT` is here to simply help capture the state of the Population at this peak Fitness based on observation of initial results.
+The reference paper seems to allude to this behaviour briefly on pg 220 where during testing with other algorithms, both `POPULATION_SIZE` and `GENERATION_COUNT` had to be fined tuned.
+
+Next, go to line 69. This is where the Population is initialised using the various user defined settings. Importantly, the 4th argument (`createCustomGene()` by default) can also take in `null`. This causes the algorithm to use a randomly generated Population where each Person has no preferences.
+
+The 5th and 6th argument are int arrays taking in a variable list of Person IDs and represent Person objects that ought to be grouped together, or separated, respectively.
+1. For instance, putting `1` and `11` in the 5th argument means that Genes where `Person 1` and `Person 11` are in the same group will be considered fitter (depending on the value of `WEIGHT_DISTRIBUTION` in the Weight class)
+2. On the other hand, putting `0` and `16` in the 6th argument means that Genes where `Person 0` and `Person 16` are in different groups will be considered fitter (also depending on the value of `WEIGHT_DISTRIBUTION` in the Weight class)
+3. Ensure that the integers input into these arrays are never >= `GENE_LENGTH`. (Person IDs are zero-indexed by default).
+4. For any 2 Person IDs, they should not simultaneously be in both int arrays at the same time. (Logically speaking, 2 individuals cannot be grouped together AND separated at the same time)
+
 
 # Developer notes
 
@@ -59,9 +80,9 @@ In summary, there is no one-size-fits-all answer. It's recommended to experiment
 Based on the paper
 
 1. Swap mutation is carried out by a probability, which swaps the position of 2 randomly selected indexes in a gene.
-2. Invert mutation on the other hand inverts a subsection of the gene. However, the result of this is accepted ONLY IF the result is fitter than the input
+2. Invert mutation on the other hand inverts a subsection of the gene. However, the result of this is accepted ONLY IF the result is fitter than the input.
 
-The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not.
+The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not. This has the side effect where after sufficient iterations of the algorithm, Fitness seems to decrease and stabilize after reaching its peak fitness. However, this stabilized fitness is often still more than the initial population fitness.
 
 Paper also doesn't specify whether Invert mutation occurs on a probability, but this is assumed to be yes.
 

@@ -7,29 +7,37 @@ import java.util.Arrays;
  */
 public class Weight {
 
-    // Absolute weights of individual characteristics
+    // Absolute weights of individual characteristics.
+    // Weight of Homogeneous characteristics.
     public static final double homo1 = 2;
     public static final double homo2 = 3;
+    public static final double homo3 = 5;
+
+    // Weight of Heterogeneous characteristics.
     public static final double hetero1 = 2;
     public static final double hetero2 = 5;
-    public static final double bal1 = 4;
-    public static final double bal2 = 6;
-    public static final double charWeightSum = homo1 + homo2 + hetero1 + hetero2 + bal1 + bal2;
+    public static final double hetero3 = 10;
 
 
+    // Weights of characteristics stored in array.
+    // No of items in each array determines length of hetero/homo arrays in Person object.
+    public static double[] heteroWeights = new double[]{ hetero1, hetero2, hetero3};
+    public static double heteroWeightSum = Arrays.stream(heteroWeights).sum();
+    public static int HETERO_TOTAL_COUNT = heteroWeights.length;
+    public static double[] homoWeights = new double[] { homo1, homo2, homo3 };
+    public static double homoWeightSum = Arrays.stream(homoWeights).sum();
+    public static int HOMO_TOTAL_COUNT = homoWeights.length;
 
-    // Weights of characteristic groups (used for calculating various F values)
+
+    // Weights of F values for calculating overall fitness.
+    // Weights of fHetero and fHomo (specifically used in calculating fMix). Total should be 1.
     public static final double WEIGHT_HETEROGENEOUS = 0.5;
     public static final double WEIGHT_HOMOGENEOUS = 1 - WEIGHT_HETEROGENEOUS;
 
-
-    // Normalized weights of characteristics, split into heterogeneous, homogeneous and balanced.
-    public static double[] heteroWeights = new double[]{ (hetero1 / charWeightSum), (hetero2 / charWeightSum ) };
-    public static double heteroWeightSum = Arrays.stream(heteroWeights).sum();
-    public static double[] homoWeights = new double[] { (homo1 / charWeightSum), (homo2 / charWeightSum) };
-    public static double homoWeightSum = Arrays.stream(homoWeights).sum();
-
-
-
-
+    // Weights of fMix, fBal, fDist and fPref
+    public static final double WEIGHT_MIX = 2;
+    public static final double WEIGHT_BALANCE = 2;
+    public static final double WEIGHT_DISTRIBUTION = 3;
+    public static final double WEIGHT_PREFERENCE = 1;
+    public static final double F_TOTAL_WEIGHT = WEIGHT_MIX + WEIGHT_BALANCE + WEIGHT_DISTRIBUTION + WEIGHT_PREFERENCE;
 }
