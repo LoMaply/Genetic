@@ -22,11 +22,19 @@ public class Population {
     }
 
     /**
-     * Creates a base gene and generates initial population by randomly permutating it.
+     * Creates a base gene and generates initial population by randomly permuting it.
+     * @param geneLength Length of gene to be generated. Ignored when {@param customGene} is provided.
+     * @param geneCount No. of genes in Population.
+     * @param groupNo No. of equal sized groups to form.
+     * @param customGene Optional customGene to be used instead of randomly generated baseGene.
+     * @param aggregate Array of Ids of Persons to group together.
+     * @param distribute Array of Ids of Persons to separate.
      */
-    public static Population initialise(int geneLength, int geneCount, int groupNo, Person[] customGene) {
-        Gene.setBaseGene(geneLength, groupNo, customGene);
-        return new Population(geneLength, geneCount);
+    public static Population initialise(int geneLength, int geneCount, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
+        int length = customGene == null ? geneLength : customGene.length;
+
+        Gene.setBaseInfo(length, groupNo, customGene, aggregate, distribute);
+        return new Population(length, geneCount);
     }
 
     /**

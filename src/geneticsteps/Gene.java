@@ -6,17 +6,23 @@ import model.Weight;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
 public class Gene {
 
-    public static List<Person> baseGene;
-    public static double[] meanHetero; // Means of each heterogeneous characteristic for every Person in gene.
-    public static double[] meanHomo; // Means of each homogeneous characteristic for every Person in gene.
-    public static int[] groupIndex; // Starting index of each group in gene.
+    // Class fields to be set before genetic algorithm can proceed.
+    private static List<Person> baseGene;
+    private static double[] meanHetero; // Mean of each heterogeneous characteristic of all Persons in gene.
+    private static double[] meanHomo; // Mean of each homogeneous characteristic of all Persons in gene.
+    private static int[] groupIndex; // Starting index of each group in gene.
+    public static HashSet<Integer> aggregatedPersons = new HashSet<>(); // Ids of Persons to be grouped together.
+    public static HashSet<Integer> distributedPersons = new HashSet<>(); // Ids of Persons to be separated.
 
+
+    // Fields for Gene instance.
     private final Person[] gene;
     private final double fitness; // Total fitness of gene.
     private final int length;
@@ -42,11 +48,24 @@ public class Gene {
     /**
      * Creates base array of Person objects, to be used for generating random permutations for initial population.
      * Stores information related to baseGene, useful for some calculations.
-     * @param geneLength No. of Person objects in each gene.
+     * @param geneLength No. of Person objects to randomly generate OR length of non-null {@param customGene}.
      * @param groupNo No. of equal sized groups to form.
+     * @param customGene Optional customGene to be used instead of randomly generated baseGene.
+     * @param aggregate Array of Ids of Persons to group together.
+     * @param distribute Array of Ids of Persons to separate.
      */
-    public static void setBaseGene(int geneLength, int groupNo, Person[] customGene) {
+    public static void setBaseInfo(int geneLength, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
+
+        // Set baseGene used to generate initial population. Creates random base gene when null argument provided
         baseGene = Arrays.asList(Objects.requireNonNullElseGet(customGene, () -> Person.createPeople(geneLength)));
+
+        // Store Ids of aggregated/distributed Persons into respective HashSet (for calculating fDist).
+        for (int person : aggregate) {
+            aggregatedPersons.add(person);
+        }
+        for (int person : distribute) {
+            distributedPersons.add(person);
+        }
 
         // Store total mean of each characteristic individually (for calculating fBal).
         meanHetero = new double[Weight.HETERO_TOTAL_COUNT];
@@ -63,7 +82,7 @@ public class Gene {
             }
         });
 
-        // Stores index of 1st member of each group in groupIndex (for group based calculations).
+        // Store index of 1st member of each group in groupIndex (for group based calculations).
         groupIndex = new int[groupNo];
         int index = 0;
         int standard = geneLength / groupNo;
@@ -93,8 +112,7 @@ public class Gene {
     }
 
     /**
-     * Calculates fitness of gene based on reference paper (WIP).
-     * Currently only considers fMix and fBal (swap return statements to include/exclude fBal).
+     * Calculates fitness of gene based on several F values as detailed in reference paper.
      * @param gene Person array to calculate fitness for.
      * @return Fitness value as a double.
      */
@@ -103,11 +121,10 @@ public class Gene {
         double fHomo = 0;
         double fBal = 0;
         double fPref = 0;
+        double fDist = 0;
 
         // For each group.
         for (int i = 0; i < groupIndex.length; i++) {
-
-            // For fHetero & fHomo.
 
             // Index of first group member
             int firstMem = groupIndex[i];
@@ -118,10 +135,11 @@ public class Gene {
             for (int j = firstMem; j < lastMem; j++) {
                 for (int k = j + 1; k <= lastMem; k++) {
                     // fHetero and fHomo to calculate fMix
-                    fHetero += gene[j].calcSimilarity(gene[k]);
-                    fHomo += gene[j].calcDifference(gene[k]);
+                    fHetero += Person.calcSimilarity(gene[j], gene[k]);
+                    fHomo += Person.calcDifference(gene[j], gene[k]);
 
-                    fPref += Person.isPreferred(gene[j], gene[k]);
+                    fPref += Person.calcPreferred(gene[j], gene[k]);
+                    fDist += Person.calcDistribution(gene[j], gene[k]);
                 }
             }
 
@@ -151,11 +169,10 @@ public class Gene {
             }
         }
 
-        double fMix = (Weight.WEIGHT_HETEROGENEOUS) * fHetero + (Weight.WEIGHT_HOMOGENEOUS) * fHomo;
+        double fMix = fHetero * Weight.WEIGHT_HETEROGENEOUS + fHomo * Weight.WEIGHT_HOMOGENEOUS;
 
-        return (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE + fPref * Weight.WEIGHT_PREFERENCE) / Weight.F_TEMP;
-        // return (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE) / Weight.WEIGHT_MIX + Weight.WEIGHT_BALANCE;
-        // return fMix;
+        // Fitness = 1 / F, hence the inversion of numerator & denominator.
+        return Weight.F_TOTAL_WEIGHT / (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE + fPref * Weight.WEIGHT_PREFERENCE + fDist * Weight.WEIGHT_DISTRIBUTION);
     }
 
     /**
@@ -196,6 +213,8 @@ public class Gene {
         gene[random2] = temp;
         return this;
 
+        // Alternate implementation with condition to apply when result fitter than input, for testing.
+
         /*
         Person[] result = Arrays.copyOf(this.gene, this.length);
 
@@ -203,7 +222,6 @@ public class Gene {
         result[random1] = result[random2];
         result[random2] = temp;
         return (calculateFitness(result) > this.getFitness()) ? new Gene(result, this.length) : this;
-
          */
     }
 
@@ -247,7 +265,7 @@ public class Gene {
      * Prints gene where all elements are in their respective groups (denoted by a new line).
      */
     public void printAsGroup() {
-        System.out.println("\nFittest group of fitness: " + this.fitness);
+        System.out.println("Fitness: " + this.fitness);
         for (int i = 0; i < groupIndex.length; i++) {
             int firstMem = groupIndex[i];
             int lastMem = i < groupIndex.length - 1 ? groupIndex[i + 1] - 1 : gene.length - 1;

@@ -11,11 +11,11 @@ import java.util.Random;
 
 public class Main {
 
-    public static int POPULATION_SIZE = 100; // No. of genes in each population.
+    public static int POPULATION_SIZE = 50; // No. of genes in each population.
     public static int GENE_LENGTH = 20; // No. of Person objects in each gene.
     public static int GROUP_NUMBER = 5; // No. of equal sized groups to split Person objects into.
-    public static int GENERATION_COUNT = 1000; // Max no. of generations to run.
-    public static int FITNESS_LIMIT = 150000; // Minimum fitness for stopping algo.
+    public static int GENERATION_COUNT = 500; // Max no. of generations to run.
+    public static double FITNESS_LIMIT = 6.2; // Minimum fitness for stopping algo.
     public static double GENERATION_GAP = 0.9; // Ratio of parent population to child population, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -66,7 +66,7 @@ public class Main {
 
         // Create population, geneLength and size must be > 1 at all times, I won't bother with error checking.
         // Replace createCustomGene() argument with null to test with random data (no preferences) instead of same data.
-        Population population = Population.initialise(GENE_LENGTH, POPULATION_SIZE, GROUP_NUMBER, createCustomGene());
+        Population population = Population.initialise(GENE_LENGTH, POPULATION_SIZE, GROUP_NUMBER, createCustomGene(), new int[]{ 1, 11 }, new int[]{ 0, 16 });
         population.printPopulation();
         System.out.println("\n");
 
@@ -114,6 +114,8 @@ public class Main {
         }
 
         population.printPopulation();
-        population.getFittestGenes(1).get(0).printAsGroup();
+        Gene fittest = population.getFittestGenes(1).get(0);
+        System.out.println("\n\nFittest gene: " + fittest.toString());
+        fittest.printAsGroup();
     }
 }

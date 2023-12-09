@@ -1,5 +1,7 @@
 package model;
 
+import geneticsteps.Gene;
+
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -60,43 +62,54 @@ public class Person {
     }
 
     /**
-     * Calculates (1 - average) of {@param pair1}'s and {@param pair2}'s preference for each other.
-     * Currently, each Person's peference for another Person is ether 0 or 1. Might be changed to support 0 <= x <= 1 in future.
+     * Calculates similarity for {@param pair1} and {@param pair2} based on Heterogeneous characteristics for fHetero.
+     * @return Similarity value, as a double.
+     */
+    public static double calcSimilarity(Person pair1, Person pair2) {
+        double similaritySum = 0;
+        for (int i = 0; i < Weight.HETERO_TOTAL_COUNT; i++) {
+            similaritySum += Weight.heteroWeights[i] * Math.abs(pair1.heterogeneous[i] - pair2.heterogeneous[i]);
+        }
+        return similaritySum / Weight.heteroWeightSum;
+    }
+
+    /**
+     * Calculates difference for {@param pair1} and {@param pair2} based on Homogeneous characteristics for fHomo.
+     * @return Difference value, as a double.
+     */
+    public static double calcDifference(Person pair1, Person pair2) {
+        double differenceSum = 0;
+        for (int i = 0; i < Weight.HOMO_TOTAL_COUNT; i++) {
+            differenceSum += Weight.homoWeights[i] * Math.abs(pair1.homogeneous[i] - pair2.homogeneous[i]);
+        }
+        return 1 - (differenceSum / Weight.homoWeightSum);
+    }
+
+    /**
+     * Calculates (1 - average) of {@param pair1} and {@param pair2} preference for each other for fPref.
+     * Currently, each Person's preference for another Person is ether 0 or 1. Might be changed to support 0 <= x <= 1 in future.
      * @return Preference average for fPref calculation.
      */
-    public static double isPreferred(Person pair1, Person pair2) {
+    public static double calcPreferred(Person pair1, Person pair2) {
         int first = pair1.preferences.contains(pair2.id) ? 1 : 0;
         int second = pair2.preferences.contains(pair1.id) ? 1 : 0;
         return 1 - ((first + second) / 2.0);
     }
 
     /**
-     * Calculates similarity for 2 Person objects based on Heterogeneous characteristics.
-     * @param groupMate 2nd Person object to be calculated with.
-     * @return Similarity value, as a double.
+     * Calculates rValue of {@param pair1} and {@param pair2} for fDist.
+     * @return rValue as an int.
      */
-    public double calcSimilarity(Person groupMate) {
-        double[] first = this.heterogeneous;
-        double similaritySum = 0;
-        for (int i = 0; i < first.length; i++) {
-            similaritySum += Weight.heteroWeights[i] * Math.abs(first[i] - groupMate.heterogeneous[i]);
+    public static int calcDistribution(Person pair1, Person pair2) {
+        List<Integer> pairId = new ArrayList<>();
+        pairId.add(pair1.id);
+        pairId.add(pair2.id);
+        int rValue = 0;
+        if (Gene.aggregatedPersons.containsAll(pairId)) {
+            rValue = -1;
+        } else if (Gene.distributedPersons.containsAll(pairId)) {
+            rValue = 1;
         }
-        return similaritySum / Weight.heteroWeightSum;
+        return rValue;
     }
-
-    /**
-     * Calculates difference for 2 Person objects based on Homogeneous characteristics.
-     * @param groupMate 2nd Person object to be calculated with.
-     * @return Difference value, as a double.
-     */
-    public double calcDifference(Person groupMate) {
-        double[] first = this.homogeneous;
-        double differenceSum = 0;
-        for (int i = 0; i < first.length; i++) {
-            differenceSum += Weight.homoWeights[i] * Math.abs(first[i] - groupMate.homogeneous[i]);
-        }
-        return 1 - (differenceSum / Weight.homoWeightSum);
-    }
-
-
 }

@@ -29,18 +29,15 @@ public class Weight {
     public static int HOMO_TOTAL_COUNT = homoWeights.length;
 
 
-
-    // Weights of fHetero and fHomo (specifically used in calculating fMix).
+    // Weights of F values for calculating overall fitness.
+    // Weights of fHetero and fHomo (specifically used in calculating fMix). Total should be 1.
     public static final double WEIGHT_HETEROGENEOUS = 0.5;
     public static final double WEIGHT_HOMOGENEOUS = 1 - WEIGHT_HETEROGENEOUS;
 
     // Weights of fMix, fBal, fDist and fPref
-    public static final double WEIGHT_MIX = 1;
-    public static final double WEIGHT_BALANCE = 1;
-    public static final double WEIGHT_DISTRIBUTION = 1;
-    public static final double WEIGHT_PREFERENCE = 4;
+    public static final double WEIGHT_MIX = 2;
+    public static final double WEIGHT_BALANCE = 2;
+    public static final double WEIGHT_DISTRIBUTION = 3;
+    public static final double WEIGHT_PREFERENCE = 1;
     public static final double F_TOTAL_WEIGHT = WEIGHT_MIX + WEIGHT_BALANCE + WEIGHT_DISTRIBUTION + WEIGHT_PREFERENCE;
-    // Temporarily used over F_TOTAL_WEIGHT as fDist and fPref not implemented yet.
-    public static final double F_TEMP = WEIGHT_MIX + WEIGHT_BALANCE + WEIGHT_PREFERENCE;
-
 }
