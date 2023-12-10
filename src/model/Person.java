@@ -67,10 +67,10 @@ public class Person {
      */
     public static double calcSimilarity(Person pair1, Person pair2) {
         double similaritySum = 0;
-        for (int i = 0; i < Weight.HETERO_TOTAL_COUNT; i++) {
-            similaritySum += Weight.heteroWeights[i] * Math.abs(pair1.heterogeneous[i] - pair2.heterogeneous[i]);
+        for (int i = 0; i < Weight.HOMO_TOTAL_COUNT; i++) {
+            similaritySum += Weight.homoWeights[i] * Math.abs(pair1.homogeneous[i] - pair2.homogeneous[i]);
         }
-        return similaritySum / Weight.heteroWeightSum;
+        return similaritySum / Weight.homoWeightSum;
     }
 
     /**
@@ -79,10 +79,10 @@ public class Person {
      */
     public static double calcDifference(Person pair1, Person pair2) {
         double differenceSum = 0;
-        for (int i = 0; i < Weight.HOMO_TOTAL_COUNT; i++) {
-            differenceSum += Weight.homoWeights[i] * Math.abs(pair1.homogeneous[i] - pair2.homogeneous[i]);
+        for (int i = 0; i < Weight.HETERO_TOTAL_COUNT; i++) {
+            differenceSum += Weight.heteroWeights[i] * Math.abs(pair1.heterogeneous[i] - pair2.heterogeneous[i]);
         }
-        return 1 - (differenceSum / Weight.homoWeightSum);
+        return 1 - (differenceSum / Weight.heteroWeightSum);
     }
 
     /**

@@ -135,8 +135,8 @@ public class Gene {
             for (int j = firstMem; j < lastMem; j++) {
                 for (int k = j + 1; k <= lastMem; k++) {
                     // fHetero and fHomo to calculate fMix
-                    fHetero += Person.calcSimilarity(gene[j], gene[k]);
-                    fHomo += Person.calcDifference(gene[j], gene[k]);
+                    fHomo += Person.calcSimilarity(gene[j], gene[k]);
+                    fHetero += Person.calcDifference(gene[j], gene[k]);
 
                     fPref += Person.calcPreferred(gene[j], gene[k]);
                     fDist += Person.calcDistribution(gene[j], gene[k]);
