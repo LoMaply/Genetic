@@ -1,12 +1,10 @@
-# Genetic Algo test
+# Genetic Algorithm for Group Matching
 
-This is a repository to test an implementation of a genetic algorithm for team matching.
+This is a repository to test a prototype implementation of a genetic algorithm for matching individuals into groups based on several characteristics.
 
-For now, the actual fitness function containing variables to match people is still being tested. For now this algorithm will judge fitness based on how close an array is to being sorted in ascending order.
-- Fitness = Total sum of array indexes where i = arr\[i\]
+This algorithm is based on the [following paper](https://www.sciencedirect.com/science/article/abs/pii/S0950705117304914#sec0013) by Yaqian Zheng, Chunrong Li, Shiyu Liu and Weigang Lu.
 
-The following are some of the settings for the algorithm as detailed by the [reference paper](https://www.sciencedirect.com/science/article/abs/pii/S0950705117304914#sec0013) (also uploaded to Teams)
-
+The following are some settings for the algorithm as detailed in the paper under Section 5.3
 
 - Generation Gap = 0.9
 - Crossover Operator Probability = 0.9
@@ -98,5 +96,14 @@ Based on the paper
 
 The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not. This has the side effect where after sufficient iterations of the algorithm, Fitness seems to decrease and stabilize after reaching its peak fitness. However, this stabilized fitness is often still more than the initial population fitness.
 
+The temporary solution for this is to introduce a `FITNESS_LIMIT` variable that stops the algorithm when a certain fitness threshold is met, as only the data of the final Population is written to the console.
+
 Paper also doesn't specify whether Invert mutation occurs on a probability, but this is assumed to be yes.
 
+## Issue 3
+
+Not so much an issue with the paper, but a note on the current implementation of `fPref` (preference of being grouped with a particular Person) when calculating fitness.
+
+The paper uses a 1 - 5 normalized scale to calculate `fPref`.
+
+In the current implementation, a `Person A` has an integer array containing the IDs of other people `Person A` prefers to be grouped with. All these people will be assigned the value `1`, while all other people are assigned `0` when it comes to calculating `fPref` with respect to `Person A`.
