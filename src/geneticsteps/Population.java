@@ -31,10 +31,8 @@ public class Population {
      * @param distribute Array of Ids of Persons to separate.
      */
     public static Population initialise(int geneLength, int geneCount, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
-        int length = customGene == null ? geneLength : customGene.length;
-
-        Gene.setBaseInfo(length, groupNo, customGene, aggregate, distribute);
-        return new Population(length, geneCount);
+        Gene.setBaseInfo(geneLength, groupNo, customGene, aggregate, distribute);
+        return new Population(geneLength, geneCount);
     }
 
     /**

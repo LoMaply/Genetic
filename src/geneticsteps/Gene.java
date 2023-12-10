@@ -145,8 +145,8 @@ public class Gene {
 
             // For fBal.
 
-            double[] groupMeanHetero = new double[lastMem - firstMem + 1];
-            double[] groupMeanHomo = new double[lastMem - firstMem + 1];
+            double[] groupMeanHetero = new double[Weight.HETERO_TOTAL_COUNT];
+            double[] groupMeanHomo = new double[Weight.HOMO_TOTAL_COUNT];
 
             // Calculate mean char of all members of current group.
             for (int j = firstMem; j <= lastMem; j++) {

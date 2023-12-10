@@ -12,7 +12,7 @@ import java.util.Random;
 public class Main {
 
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
-    public static int GENE_LENGTH = 20; // No. of Person objects in each gene.
+    public static int GENE_LENGTH = 10; // No. of Person objects in each gene.
     public static int GROUP_NUMBER = 5; // No. of equal sized groups to split Person objects into.
     public static int GENERATION_COUNT = 500; // Max no. of generations to run.
     public static double FITNESS_LIMIT = 6.2; // Minimum fitness for stopping algo.
@@ -31,6 +31,7 @@ public class Main {
 
     /**
      * Creates a custom gene, allows testing with constant data as opposed to random data.
+     * Ensure that every array index contains a Person object.
      * @return Custom user defined gene.
      */
     public static Person[] createCustomGene() {

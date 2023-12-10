@@ -15,18 +15,32 @@ The following are some of the settings for the algorithm as detailed by the [ref
 
 # Usage
 
+### Modifying settings
+
 Simply run `Main`. Several settings to take note of below:
 
-There are 2 main classes where the user can change the algorithm settings as follows:
+There are 2 main classes where the user can change the algorithm settings by modifying the values of the class variables as follows:
 1. Weight.java - Allows user to modify the weights of various groups, which impacts the calculated Fitness of a particular Gene.
 2. Main.java - Allows user to modify the various probability chances, generation count, population count, gene size etc.
 
-To start off, first set the `FITNESS_LIMIT` in Main.java to a high value. This is due to the behaviour of the algorithm where throughout each generation, Population Fitness increases to a maximum before decreasing slightly and staying at a roughly even level.
+### Fitness Limit
+
+When the algorithm is first run on a new set of data/settings, first set the `FITNESS_LIMIT` in Main.java to a high value. This is due to the behaviour of the algorithm where throughout each generation, Population Fitness increases to a maximum before decreasing slightly and staying at a roughly even level.
 
 As such, `FITNESS_LIMIT` is here to simply help capture the state of the Population at this peak Fitness based on observation of initial results.
 The reference paper seems to allude to this behaviour briefly on pg 220 where during testing with other algorithms, both `POPULATION_SIZE` and `GENERATION_COUNT` had to be fined tuned.
 
-Next, go to line 69. This is where the Population is initialised using the various user defined settings. Importantly, the 4th argument (`createCustomGene()` by default) can also take in `null`. This causes the algorithm to use a randomly generated Population where each Person has no preferences.
+### Custom Gene
+
+Go to line 69. This is where the Population is initialised using the various user defined settings.
+
+Arguments 1, 2 and 3 should be modified from the class variables at the top of the Main class.
+
+The 4th argument can take in 2 possible values:
+1. `null`, which causes the algorithm to be run on a Gene of randomly generated Person objects. These randomly generated objects will not have any preferences.
+2. `createCustomGene()`, which causes the algorithm to run on a Gene of user created Person objects. This allows for testing on the same data. Ensure that every index of the custom gene contains a Person, and that the length of the custom gene == `GENE_LENGTH`.
+
+### Aggregation/Distribution
 
 The 5th and 6th argument are int arrays taking in a variable list of Person IDs and represent Person objects that ought to be grouped together, or separated, respectively.
 1. For instance, putting `1` and `11` in the 5th argument means that Genes where `Person 1` and `Person 11` are in the same group will be considered fitter (depending on the value of `WEIGHT_DISTRIBUTION` in the Weight class)
