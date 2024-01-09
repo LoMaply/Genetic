@@ -112,4 +112,9 @@ public class Person {
         }
         return rValue;
     }
+
+
+    public int getId() {
+        return this.id;
+    }
 }

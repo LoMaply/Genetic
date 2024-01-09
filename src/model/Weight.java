@@ -8,23 +8,32 @@ import java.util.Arrays;
 public class Weight {
 
     // Absolute weights of individual characteristics.
-    // Weight of Homogeneous characteristics.
-    public static final double homo1 = 2;
-    public static final double homo2 = 3;
-    public static final double homo3 = 5;
-
     // Weight of Heterogeneous characteristics.
-    public static final double hetero1 = 2;
-    public static final double hetero2 = 5;
-    public static final double hetero3 = 10;
+    public static final double GENDER = 1;
+    public static final double MAJOR = 1;
+    public static final double DOER_PLANNER = 1; // Do/Plan first
+    public static final double ADAPTABILITY = 1;
+    public static final double COMMS_PROFFESIONAL = 1;
+    public static final double COMMS_GROUP = 1;
+    public static final double PROJECT_PREF = 1; // Prefer challenges/projects needing creative/critical thinking?
+    public static final double EXPLORE = 1;
+    public static final double MANAGE_CONFLICT = 1;
 
+    // Weight of Homogeneous characteristics.
+    public static final double FEEDBACK_GIVE = 1;
+    public static final double FEEDBACK_GET = 1;
+    public static final double BIRD_OWL = 1; // Early bird or night owl
+    public static final double MEETING_TIME = 1; // Morning/Evening meeting
+    public static final double WORK_CONSISTENCY = 1;
+    public static final double MEETING_LOCATION = 1;
+    public static final double MEETING_OCCURENCE = 1;
 
     // Weights of characteristics stored in array.
     // No of items in each array determines length of hetero/homo arrays in Person object.
-    public static double[] heteroWeights = new double[]{ hetero1, hetero2, hetero3};
+    public static double[] heteroWeights = new double[]{ GENDER, MAJOR, DOER_PLANNER, ADAPTABILITY, COMMS_PROFFESIONAL, COMMS_GROUP, PROJECT_PREF, EXPLORE, MANAGE_CONFLICT };
     public static double heteroWeightSum = Arrays.stream(heteroWeights).sum();
     public static int HETERO_TOTAL_COUNT = heteroWeights.length;
-    public static double[] homoWeights = new double[] { homo1, homo2, homo3 };
+    public static double[] homoWeights = new double[] { FEEDBACK_GIVE, FEEDBACK_GET, BIRD_OWL, MEETING_TIME, WORK_CONSISTENCY, MEETING_LOCATION, MEETING_OCCURENCE };
     public static double homoWeightSum = Arrays.stream(homoWeights).sum();
     public static int HOMO_TOTAL_COUNT = homoWeights.length;
 
@@ -37,7 +46,7 @@ public class Weight {
     // Weights of fMix, fBal, fDist and fPref
     public static final double WEIGHT_MIX = 2;
     public static final double WEIGHT_BALANCE = 2;
-    public static final double WEIGHT_DISTRIBUTION = 3;
-    public static final double WEIGHT_PREFERENCE = 1;
+    public static final double WEIGHT_DISTRIBUTION = 0;
+    public static final double WEIGHT_PREFERENCE = 0;
     public static final double F_TOTAL_WEIGHT = WEIGHT_MIX + WEIGHT_BALANCE + WEIGHT_DISTRIBUTION + WEIGHT_PREFERENCE;
 }

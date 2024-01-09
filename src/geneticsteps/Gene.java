@@ -3,6 +3,7 @@ package geneticsteps;
 import model.Person;
 import model.Weight;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
@@ -10,6 +11,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 public class Gene {
 
@@ -269,11 +271,11 @@ public class Gene {
         for (int i = 0; i < groupIndex.length; i++) {
             int firstMem = groupIndex[i];
             int lastMem = i < groupIndex.length - 1 ? groupIndex[i + 1] - 1 : gene.length - 1;
-            StringBuilder group = new StringBuilder();
+            ArrayList<Integer> groupList = new ArrayList<>();
             for (int j = firstMem; j <= lastMem; j++) {
-                group.append(gene[j]).append(" ");
+                groupList.add(gene[j].getId());
             }
-            System.out.println((i + 1) + ": " + group);
+            System.out.println(groupList.stream().sorted().map(String::valueOf).collect(Collectors.joining(" ")));
         }
     }
 }
