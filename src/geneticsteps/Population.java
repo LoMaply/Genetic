@@ -50,11 +50,18 @@ public class Population {
     }
 
     /**
-     * Returns {@param no} fittest genes from the current population as an ArrayList.
+     * Returns {@param no} fittest genes from the current population as an ArrayList. Modifies the original list.
      */
     public ArrayList<Gene> getFittestGenes(int no) {
         genes.sort(new GeneComparator());
         return new ArrayList<>(genes.subList(0, no));
+    }
+
+    /**
+     * Return only the fittest gene without modifying the original list.
+     */
+    public Gene getFittestGeneNoSort() {
+        return genes.stream().min(new GeneComparator()).orElse(null);
     }
 
     /**
@@ -82,6 +89,6 @@ public class Population {
      * Only print total fitness of current population.
      */
     public void printTotalFitness() {
-        System.out.print("Total Fitness = " + getTotalFitness() + "\n");
+        System.out.print("Total Fitness: " + getTotalFitness() + "\n");
     }
 }

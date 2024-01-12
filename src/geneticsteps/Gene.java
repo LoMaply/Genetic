@@ -41,10 +41,10 @@ public class Gene {
     /**
      * Overloaded constructor for Gene, called when generating child genes during Crossover.
      */
-    public Gene(Person[] gene, int length) {
+    public Gene(Person[] gene, int length, double fitness) {
         this.gene = gene;
         this.length = length;
-        this.fitness = calculateFitness(gene);
+        this.fitness = fitness;
     }
 
     /**
@@ -203,7 +203,7 @@ public class Gene {
                 child[i] = value;
             }
         }
-        return new Gene(child, length);
+        return new Gene(child, length, Gene.calculateFitness(child));
     }
 
     /**
@@ -214,17 +214,6 @@ public class Gene {
         gene[random1] = gene[random2];
         gene[random2] = temp;
         return this;
-
-        // Alternate implementation with condition to apply when result fitter than input, for testing.
-
-        /*
-        Person[] result = Arrays.copyOf(this.gene, this.length);
-
-        Person temp = result[random1];
-        result[random1] = result[random2];
-        result[random2] = temp;
-        return (calculateFitness(result) > this.getFitness()) ? new Gene(result, this.length) : this;
-         */
     }
 
     /**
@@ -244,7 +233,8 @@ public class Gene {
             left++;
             right--;
         }
-        return (calculateFitness(result) > this.getFitness()) ? new Gene(result, this.length) : this;
+        double fitness = calculateFitness(result);
+        return (fitness > this.getFitness()) ? new Gene(result, this.length, fitness) : this;
     }
 
     /**

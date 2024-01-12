@@ -6,6 +6,7 @@ import model.Person;
 import utils.Pair;
 
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.List;
 import java.util.Random;
 
@@ -15,7 +16,6 @@ public class Main {
     public static int GENE_LENGTH = 35; // No. of Person objects in each gene.
     public static int GROUP_NUMBER = 7; // No. of equal sized groups to split Person objects into.
     public static int GENERATION_COUNT = 1000; // Max no. of generations to run.
-    public static double FITNESS_LIMIT = 1.692; // Minimum fitness for stopping algo.
     public static double GENERATION_GAP = 0.9; // Ratio of parent population to child population, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -93,12 +93,16 @@ public class Main {
         population.printPopulation();
         System.out.println("\n");
 
+        Gene bestGene = population.getFittestGeneNoSort();
+        int bestGeneration = 0;
+
         int count = 0;
-        while (count < GENERATION_COUNT && population.getTotalFitness() < FITNESS_LIMIT) {
+        while (count < GENERATION_COUNT) {
 
             // Stochastic Universal Sampling
             // No. of selected parents = OFFSPRING_COUNT, Every parent pair produces 2 children.
             List<Gene> selectedGenes = Stochastic.selectGenes(population, OFFSPRING_COUNT);
+            Collections.shuffle(selectedGenes);
 
             // Used as upper bound when generating random integer to select 2 random points in a gene for Crossover and Mutation Operation
             int limit = GENE_LENGTH - 1;
@@ -129,16 +133,30 @@ public class Main {
             childrenPopulation.addAll(selectedGenes);
             population.updateGenes(childrenPopulation);
 
+
+            // Get fittest gene of population
+            Gene populationBest = population.getFittestGeneNoSort();
+
             // Printing outputs after each generation
             System.out.println("Generation: " + count);
             population.printTotalFitness();
+            System.out.println("Fitness: " + populationBest.getFitness());
 
+            // Update overall bestGene and corresponding generation
+            if (populationBest.getFitness() > bestGene.getFitness()) {
+                bestGene = populationBest;
+                bestGeneration = count;
+            }
             count++;
         }
 
         population.printPopulation();
-        Gene fittest = population.getFittestGenes(1).get(0);
-        System.out.println("\n\nFittest gene: " + fittest.toString());
+        Gene fittest = population.getFittestGeneNoSort();
+        System.out.println("\n\nFinal population fittest gene: " + fittest.toString());
         fittest.printAsGroup();
+
+        System.out.println("\n\nBest gene overall: " + bestGene.toString());
+        bestGene.printAsGroup();
+        System.out.print("From Generation: " + bestGeneration);
     }
 }

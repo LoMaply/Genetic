@@ -10,23 +10,23 @@ public class Weight {
     // Absolute weights of individual characteristics.
     // Weight of Heterogeneous characteristics.
     public static final double GENDER = 1;
-    public static final double MAJOR = 1;
+    public static final double MAJOR = 2;
     public static final double DOER_PLANNER = 1; // Do/Plan first
     public static final double ADAPTABILITY = 1;
     public static final double COMMS_PROFFESIONAL = 1;
     public static final double COMMS_GROUP = 1;
-    public static final double PROJECT_PREF = 1; // Prefer challenges/projects needing creative/critical thinking?
-    public static final double EXPLORE = 1;
+    public static final double PROJECT_PREF = 2; // Prefer challenges/projects needing creative/critical thinking?
+    public static final double EXPLORE = 2;
     public static final double MANAGE_CONFLICT = 1;
 
     // Weight of Homogeneous characteristics.
     public static final double FEEDBACK_GIVE = 1;
     public static final double FEEDBACK_GET = 1;
-    public static final double BIRD_OWL = 1; // Early bird or night owl
-    public static final double MEETING_TIME = 1; // Morning/Evening meeting
-    public static final double WORK_CONSISTENCY = 1;
-    public static final double MEETING_LOCATION = 1;
-    public static final double MEETING_OCCURENCE = 1;
+    public static final double BIRD_OWL = 2; // Early bird or night owl
+    public static final double MEETING_TIME = 2; // Morning/Evening meeting
+    public static final double WORK_CONSISTENCY = 2;
+    public static final double MEETING_LOCATION = 2;
+    public static final double MEETING_OCCURENCE = 2;
 
     // Weights of characteristics stored in array.
     // No of items in each array determines length of hetero/homo arrays in Person object.
