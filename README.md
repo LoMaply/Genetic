@@ -1,6 +1,7 @@
 # Genetic Algorithm for Group Matching
 
 This is a repository to test a prototype implementation of a genetic algorithm for matching individuals into groups based on several characteristics.
+The actual algorithm to be used/tested on student groups in NUS will be implemented [here](https://github.com/IEX-Team-Laddy)
 
 This algorithm is based on the [following paper](https://www.sciencedirect.com/science/article/abs/pii/S0950705117304914#sec0013) by Yaqian Zheng, Chunrong Li, Shiyu Liu and Weigang Lu.
 
