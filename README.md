@@ -1,6 +1,7 @@
 # Genetic Algorithm for Group Matching
 
 This is a repository to test a prototype implementation of a genetic algorithm for matching individuals into groups based on several characteristics.
+The actual algorithm to be used/tested on student groups in NUS will be [implemented here](https://github.com/IEX-Team-Laddy).
 
 This algorithm is based on the [following paper](https://www.sciencedirect.com/science/article/abs/pii/S0950705117304914#sec0013) by Yaqian Zheng, Chunrong Li, Shiyu Liu and Weigang Lu.
 
@@ -98,3 +99,4 @@ Not so much an issue with the paper, but a note on the current implementation of
 The paper uses a 1 - 5 normalized scale to calculate `fPref`.
 
 For the sake of simplicity in the current implementation, for a person `A`, anyone `A` prefers to be grouped with will be given a value of 1 and everyone else 0.
+In the current implementation, a `Person A` has an integer array containing the IDs of other people `Person A` prefers to be grouped with. All these people will be assigned the value `1`, while all other people are assigned `0` when it comes to calculating `fPref` with respect to `Person A`.
