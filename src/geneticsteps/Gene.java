@@ -51,7 +51,7 @@ public class Gene {
      * Stores information related to baseGene, useful for some calculations.
      * @param geneLength No. of Person objects to randomly generate OR length of non-null {@param customGene}.
      * @param groupNo No. of equal sized groups to form.
-     * @param customGene Optional customGene to be used instead of randomly generated baseGene.
+     * @param customGene List of Person objects.
      * @param aggregate Array of Ids of Persons to group together.
      * @param distribute Array of Ids of Persons to separate.
      */

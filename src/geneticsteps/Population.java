@@ -27,7 +27,7 @@ public class Population {
      * @param geneLength Length of gene to be generated. Ignored when {@param customGene} is provided.
      * @param geneCount No. of genes in Population.
      * @param groupNo No. of equal sized groups to form.
-     * @param customGene Optional customGene to be used instead of randomly generated baseGene.
+     * @param customGene List of Person objects.
      * @param aggregate Array of Ids of Persons to group together.
      * @param distribute Array of Ids of Persons to separate.
      */
