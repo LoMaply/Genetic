@@ -10,30 +10,32 @@ public class Weight {
     // Absolute weights of individual characteristics.
     // Weight of Heterogeneous characteristics.
     public static final double GENDER = 1;
-    public static final double MAJOR = 2;
-    public static final double DOER_PLANNER = 1; // Do/Plan first
     public static final double ADAPTABILITY = 1;
-    public static final double COMMS_PROFFESIONAL = 1;
-    public static final double COMMS_GROUP = 1;
-    public static final double PROJECT_PREF = 2; // Prefer challenges/projects needing creative/critical thinking?
-    public static final double EXPLORE = 2;
+    public static final double COMMS_STYLE_PREF = 1; // Preferred communication style (Assert/Collab/Avoid)
+    public static final double COMMS_INITIATE_COMFORT = 1;
+    public static final double COMMS_INITIATE_FREQ = 1;
+    public static final double MANAGE_MISTAKE = 1;
     public static final double MANAGE_CONFLICT = 1;
 
     // Weight of Homogeneous characteristics.
-    public static final double FEEDBACK_GIVE = 1;
-    public static final double FEEDBACK_GET = 1;
-    public static final double BIRD_OWL = 2; // Early bird or night owl
-    public static final double MEETING_TIME = 2; // Morning/Evening meeting
-    public static final double WORK_CONSISTENCY = 2;
-    public static final double MEETING_LOCATION = 2;
-    public static final double MEETING_OCCURENCE = 2;
+    public static final double BIRD_OWL = 1; // Early bird or night owl
+    public static final double MEETING_TIME = 1; // Morning/Evening meeting
+    public static final double DOER_PLANNER = 1;
+    public static final double MANAGE_DEADLINE = 1;
+    public static final double WORK_CONSISTENCY = 1;
+    public static final double WORK_COMMITMENT = 1;
+    public static final double MEETING_LOCATION = 1;
+    public static final double MEETING_FREQ = 1;
+    public static final double COMMS_EFFECTIVE_IMPT = 1; // Importance of effective communication for respondent
+    public static final double PROJECT_PREF = 1;
+    public static final double EXPLORE = 1;
 
     // Weights of characteristics stored in array.
     // No of items in each array determines length of hetero/homo arrays in Person object.
-    public static double[] heteroWeights = new double[]{ GENDER, MAJOR, DOER_PLANNER, ADAPTABILITY, COMMS_PROFFESIONAL, COMMS_GROUP, PROJECT_PREF, EXPLORE, MANAGE_CONFLICT };
+    public static double[] heteroWeights = new double[]{ GENDER, ADAPTABILITY, COMMS_STYLE_PREF, COMMS_INITIATE_COMFORT, COMMS_INITIATE_FREQ, MANAGE_MISTAKE, MANAGE_CONFLICT };
     public static double heteroWeightSum = Arrays.stream(heteroWeights).sum();
     public static int HETERO_TOTAL_COUNT = heteroWeights.length;
-    public static double[] homoWeights = new double[] { FEEDBACK_GIVE, FEEDBACK_GET, BIRD_OWL, MEETING_TIME, WORK_CONSISTENCY, MEETING_LOCATION, MEETING_OCCURENCE };
+    public static double[] homoWeights = new double[] { BIRD_OWL, MEETING_TIME, DOER_PLANNER, MANAGE_DEADLINE, WORK_CONSISTENCY, WORK_COMMITMENT, MEETING_LOCATION, MEETING_FREQ, COMMS_EFFECTIVE_IMPT, PROJECT_PREF, EXPLORE };
     public static double homoWeightSum = Arrays.stream(homoWeights).sum();
     public static int HOMO_TOTAL_COUNT = homoWeights.length;
 

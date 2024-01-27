@@ -5,7 +5,6 @@ import geneticsteps.Gene;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import java.util.Random;
 import java.util.stream.Collectors;
 
 public class Person {
@@ -16,18 +15,6 @@ public class Person {
     private final double[] heterogeneous;
     private final double[] homogeneous;
 
-    /**
-     * Creates a Person with random characteristics. Will allow for non-random characteristics in the future.
-     * No. of characteristics from each group depends on Weight class.
-     */
-    private Person() {
-        Random random = new Random();
-        this.id = global++;
-        this.preferences = new ArrayList<>();
-        this.heterogeneous = Arrays.stream(new double[Weight.heteroWeights.length]).map(x -> random.nextFloat()).toArray();
-        this.homogeneous = Arrays.stream(new double[Weight.homoWeights.length]).map(x -> random.nextFloat()).toArray();
-    }
-
     public Person(int[] pref, double[] hetero, double[] homo) {
         this.id = global++;
         this.preferences = Arrays.stream(pref).boxed().collect(Collectors.toList());
@@ -35,22 +22,10 @@ public class Person {
         this.homogeneous = homo;
     }
 
-    /**
-     * Creates {@param length} randomly generated People objects with no preferences.
-     * @return People objects returned as an array.
-     */
-    public static Person[] createPeople(int length) {
-        Person[] result = new Person[length];
-        for (int i = 0; i < length; i++) {
-            result[i] = new Person();
-        }
-        return result;
-    }
-
     @Override
     public String toString() {
         return Integer.toString(this.id);
-        // return this.id + "\n" + Arrays.toString(heterogeneous);
+        //return this.id + "\n" + Arrays.toString(heterogeneous) + "\n" + Arrays.toString(homogeneous);
     }
 
     public double[] getHeterogeneous() {

@@ -10,7 +10,6 @@ import java.util.HashMap;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.stream.Collectors;
 
 public class Gene {
@@ -56,10 +55,10 @@ public class Gene {
      * @param aggregate Array of Ids of Persons to group together.
      * @param distribute Array of Ids of Persons to separate.
      */
-    public static void setBaseInfo(int geneLength, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
+    public static void setBaseInfo(int geneLength, int groupNo, List<Person> customGene, int[] aggregate, int[] distribute) {
 
-        // Set baseGene used to generate initial population. Creates random base gene when null argument provided
-        baseGene = Arrays.asList(Objects.requireNonNullElseGet(customGene, () -> Person.createPeople(geneLength)));
+        // Set baseGene used to generate initial population.
+        baseGene = customGene;
 
         // Store Ids of aggregated/distributed Persons into respective HashSet (for calculating fDist).
         for (int person : aggregate) {

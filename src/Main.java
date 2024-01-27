@@ -1,8 +1,14 @@
+import model.Weight;
+import org.apache.poi.ss.usermodel.*;
+
+import java.io.FileInputStream;
+
 import geneticsteps.Crossover;
 import geneticsteps.Stochastic;
 import geneticsteps.Gene;
 import geneticsteps.Population;
 import model.Person;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import utils.Pair;
 
 import java.util.ArrayList;
@@ -12,11 +18,12 @@ import java.util.Random;
 
 public class Main {
 
+    public static String FILE_LOCATION = "src\\data\\userdata.xlsx";
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
-    public static int GENE_LENGTH = 35; // No. of Person objects in each gene.
+    public static int GENE_LENGTH = 36; // No. of Person objects in each gene.
     public static int GROUP_NUMBER = 7; // No. of equal sized groups to split Person objects into.
-    public static int GENERATION_COUNT = 1000; // Max no. of generations to run.
-    public static double GENERATION_GAP = 0.9; // Ratio of parent population to child population, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
+    public static int GENERATION_COUNT = 100; // Max no. of generations to run.
+    public static double GENERATION_GAP = 0.9; // Ratio of children to parents in next generation, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
     public static double MUTATION_PROBABILITY = 0.09; // Chance of applying either mutation operations.
@@ -30,70 +37,64 @@ public class Main {
     }
 
     /**
-     * Creates a custom gene, allows testing with constant data as opposed to random data.
-     * Ensure that every array index contains a Person object.
+     * Reads and convert user data from excel into Person objects.
      * @return Custom user defined gene.
      */
-    public static Person[] createCustomGene() {
-        Person[] custom = new Person[GENE_LENGTH];
-        custom[0] = new Person(new int[]{}, new double[]{ 0, 0, 0.25, 0.75, 1.00, 1.00, 1.00, 1.00, 1.00 }, new double[]{ 0.00, 0.00, 0, 0, 1, 0.0, 0.00 });
-        custom[1] = new Person(new int[]{}, new double[]{ 0, 0, 0.25, 0.75, 1.00, 1.00, 1.00, 0.75, 1.00 }, new double[]{ 0.33, 1.00, 1, 1, 1, 0.0, 0.50 });
-        custom[2] = new Person(new int[]{}, new double[]{ 0, 1, 0.75, 0.25, 0.50, 0.75, 0.25, 0.75, 0.75 }, new double[]{ 0.67, 1.00, 1, 1, 0, 0.5, 0.25 });
-        custom[3] = new Person(new int[]{}, new double[]{ 1, 1, 0.50, 0.25, 1.00, 1.00, 0.00, 0.50, 0.75 }, new double[]{ 0.33, 0.33, 1, 0, 1, 0.5, 0.25 });
-        custom[4] = new Person(new int[]{}, new double[]{ 0, 0, 0.75, 0.50, 0.50, 0.75, 0.75, 0.75, 0.50 }, new double[]{ 0.67, 1.00, 0, 1, 1, 0.5, 0.25 });
+    public static List<Person> createCustomGene() {
 
-        custom[5] = new Person(new int[]{}, new double[]{ 0, 0, 0.50, 0.25, 0.75, 0.75, 0.75, 0.75, 0.50 }, new double[]{ 1.00, 0.33, 1, 1, 0, 0.0, 0.25 });
-        custom[6] = new Person(new int[]{}, new double[]{ 0, 0, 0.25, 0.75, 0.50, 1.00, 0.00, 0.75, 1.00 }, new double[]{ 1.00, 1.00, 1, 1, 1, 0.5, 0.00 });
-        custom[7] = new Person(new int[]{}, new double[]{ 0, 0, 0.00, 0.25, 0.75, 0.75, 0.00, 0.75, 0.75 }, new double[]{ 0.00, 0.00, 1, 1, 0, 1.0, 0.00 });
-        custom[8] = new Person(new int[]{}, new double[]{ 0, 1, 0.00, 1.00, 1.00, 1.00, 1.00, 0.75, 0.75 }, new double[]{ 1.00, 1.00, 1, 1, 1, 0.5, 0.00 });
-        custom[9] = new Person(new int[]{}, new double[]{ 0, 0, 0.75, 0.75, 1.00, 0.50, 1.00, 1.00, 0.25 }, new double[]{ 0.33, 0.33, 1, 0, 1, 0.5, 0.00 });
+        List<Person> custom = new ArrayList<>(GENE_LENGTH);
 
-        custom[10] = new Person(new int[]{}, new double[]{ 0, 0, 0.50, 0.25, 1.00, 0.75, 1.00, 0.75, 0.75 }, new double[]{ 0.00, 0.00, 0, 0, 1, 0.5, 0.00 });
-        custom[11] = new Person(new int[]{}, new double[]{ 0, 1, 0.50, 1.00, 1.00, 1.00, 0.75, 1.00, 0.75 }, new double[]{ 0.33, 0.33, 1, 1, 1, 0.0, 0.50 });
-        custom[12] = new Person(new int[]{}, new double[]{ 1, 1, 0.25, 0.50, 0.75, 0.75, 0.50, 0.75, 0.75 }, new double[]{ 1.00, 0.33, 1, 0, 1, 0.5, 0.25 });
-        custom[13] = new Person(new int[]{}, new double[]{ 1, 0, 0.75, 0.50, 1.00, 1.00, 0.75, 0.75, 0.50 }, new double[]{ 0.67, 0.67, 1, 0, 0, 0.5, 0.25 });
-        custom[14] = new Person(new int[]{}, new double[]{ 1, 0, 0.75, 0.75, 0.75, 0.75, 1.00, 0.75, 0.75 }, new double[]{ 1.00, 1.00, 0, 0, 1, 0.0, 0.50 });
+        try {
+            FileInputStream file = new FileInputStream(FILE_LOCATION);
+            XSSFWorkbook workbook = new XSSFWorkbook(file);
+            Sheet heteroData = workbook.getSheetAt(1);
+            Sheet homoData = workbook.getSheetAt(2);
 
-        custom[15] = new Person(new int[]{}, new double[]{ 0, 0, 1.00, 0.50, 0.75, 0.75, 0.50, 0.50, 0.50 }, new double[]{ 0.00, 0.67, 0, 0, 0, 0.5, 0.00 });
-        custom[16] = new Person(new int[]{}, new double[]{ 1, 1, 1.00, 1.00, 1.00, 0.75, 0.50, 0.75, 0.25 }, new double[]{ 0.00, 1.00, 1, 0, 0, 0.5, 0.50 });
-        custom[17] = new Person(new int[]{}, new double[]{ 0, 1, 0.75, 0.75, 0.75, 0.75, 0.00, 1.00, 0.00 }, new double[]{ 0.33, 0.33, 0, 1, 0, 0.0, 0.00 });
-        custom[18] = new Person(new int[]{}, new double[]{ 0, 0, 0.75, 0.75, 1.00, 0.75, 1.00, 1.00, 0.75 }, new double[]{ 0.00, 0.33, 0, 0, 1, 0.5, 0.50 });
-        custom[19] = new Person(new int[]{}, new double[]{ 1, 1, 0.00, 0.75, 0.75, 0.75, 0.50, 0.50, 0.50 }, new double[]{ 0.33, 0.33, 1, 0, 1, 1.0, 0.00 });
+            // Ignore headers from excel files
+            for (int i = 1; i < GENE_LENGTH + 1; i++) {
+                Row hetero = heteroData.getRow(i);
+                Row homo = homoData.getRow(i);
 
-        custom[20] = new Person(new int[]{}, new double[]{ 0, 0, 0.75, 0.75, 0.50, 0.75, 1.00, 0.50, 0.25 }, new double[]{ 1.00, 1.00, 0, 0, 0, 0.0, 0.75 });
-        custom[21] = new Person(new int[]{}, new double[]{ 1, 0, 0.25, 1.00, 0.25, 0.25, 1.00, 1.00, 0.75 }, new double[]{ 0.33, 0.33, 0, 0, 1, 0.0, 0.50 });
-        custom[22] = new Person(new int[]{}, new double[]{ 1, 0, 0.50, 0.75, 0.50, 0.50, 0.75, 0.75, 0.75 }, new double[]{ 0.33, 0.33, 1, 0, 0, 0.0, 0.50 });
-        custom[23] = new Person(new int[]{}, new double[]{ 0.5, 1, 0.75, 0.75, 0.75, 0.5, 0.0, 0.50, 0.75 }, new double[]{ 0.00, 0.00, 1, 0, 1, 0.5, 0.50 });
-        custom[24] = new Person(new int[]{}, new double[]{ 0, 0, 0.75, 0.25, 0.75, 0.75, 0.25, 0.50, 0.25 }, new double[]{ 0.67, 1.00, 0, 0, 1, 0.0, 0.25 });
+                double[] heteroChars = convertRowToDoubleArray(hetero, Weight.HETERO_TOTAL_COUNT);
+                double[] homoChars = convertRowToDoubleArray(homo, Weight.HOMO_TOTAL_COUNT);
 
-        custom[25] = new Person(new int[]{}, new double[]{ 0, 1, 0.75, 0.75, 0.50, 0.75, 1.00, 1.00, 0.75 }, new double[]{ 0.00, 1.00, 1, 1, 0, 0.0, 0.50 });
-        custom[26] = new Person(new int[]{}, new double[]{ 0, 0, 1.00, 0.50, 0.25, 0.25, 0.75, 0.75, 0.50 }, new double[]{ 0.00, 0.33, 1, 0, 0, 0.0, 0.00 });
-        custom[27] = new Person(new int[]{}, new double[]{ 1, 1, 0.25, 0.25, 0.50, 0.50, 0.75, 0.75, 0.75 }, new double[]{ 1.00, 0.33, 1, 1, 1, 0.5, 0.25 });
-        custom[28] = new Person(new int[]{}, new double[]{ 1, 1, 0.75, 0.50, 0.75, 0.50, 1.00, 0.75, 0.50 }, new double[]{ 0.33, 0.67, 1, 1, 0, 0.5, 0.50 });
-        custom[29] = new Person(new int[]{}, new double[]{ 0, 1, 0.25, 0.75, 0.75, 0.75, 0.75, 0.75, 0.50 }, new double[]{ 0.33, 0.33, 1, 1, 1, 0.5, 0.50 });
-
-        custom[30] = new Person(new int[]{}, new double[]{ 1, 0, 0.50, 0.75, 0.75, 0.50, 0.25, 0.75, 0.25 }, new double[]{ 0.33, 0.33, 1, 1, 1, 0.0, 0.25 });
-        custom[31] = new Person(new int[]{}, new double[]{ 1, 0, 0.75, 1.00, 0.75, 0.75, 0.75, 1.00, 0.75 }, new double[]{ 0.33, 1.00, 0, 0, 1, 0.5, 0.50 });
-        custom[32] = new Person(new int[]{}, new double[]{ 1, 1, 0.50, 0.75, 1.00, 0.75, 0.75, 0.75, 0.75 }, new double[]{ 0.00, 0.00, 0, 1, 1, 0.5, 0.00 });
-        custom[33] = new Person(new int[]{}, new double[]{ 1, 0, 1.00, 0.75, 0.75, 1.00, 0.75, 0.75, 1.00 }, new double[]{ 0.33, 0.33, 1, 1, 1, 0.0, 0.50 });
-        custom[34] = new Person(new int[]{}, new double[]{ 1, 0, 0.75, 0.50, 0.75, 0.75, 0.75, 1.00, 0.50 }, new double[]{ 0.33, 0.33, 1, 1, 1, 0.0, 0.25 });
+                Person person = new Person(new int[]{}, heteroChars, homoChars);
+                custom.add(person);
+            }
+            file.close();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
 
         return custom;
     }
 
+    /**
+     * Converts row of excel data into double array.
+     */
+    private static double[] convertRowToDoubleArray(Row row, int columnCount) {
+        double[] data = new double[columnCount];
+        for (int i = 0; i < columnCount; i++) {
+            Cell cell = row.getCell(i);
+            data[i] = cell.getNumericCellValue();
+        }
+        return data;
+    }
 
-    public static void main(String[] args) {
+    /**
+     * Run genetic algo.
+     */
+    public static void run() {
         // RNG for various random no. selections
         Random random = new Random();
 
         // Create population, geneLength and size must be > 1 at all times, I won't bother with error checking.
-        // Replace createCustomGene() argument with null to test with random data (no preferences) instead of same data.
         // Final 2 arrays represent Persons to be grouped together and split up respectively.
         Population population = Population.initialise(GENE_LENGTH, POPULATION_SIZE, GROUP_NUMBER, createCustomGene(), new int[]{}, new int[]{});
         population.printPopulation();
         System.out.println("\n");
 
-        Gene bestGene = population.getFittestGeneNoSort();
+        Gene overallBestGene = population.getFittestGeneNoSort();
         int bestGeneration = 0;
 
         int count = 0;
@@ -137,26 +138,33 @@ public class Main {
             // Get fittest gene of population
             Gene populationBest = population.getFittestGeneNoSort();
 
-            // Printing outputs after each generation
-            System.out.println("Generation: " + count);
-            population.printTotalFitness();
-            System.out.println("Fitness: " + populationBest.getFitness());
-
             // Update overall bestGene and corresponding generation
-            if (populationBest.getFitness() > bestGene.getFitness()) {
-                bestGene = populationBest;
+            if (populationBest.getFitness() > overallBestGene.getFitness()) {
+                overallBestGene = populationBest;
                 bestGeneration = count;
             }
             count++;
+
+
+            // Printing outputs after each generation
+            System.out.println("Generation: " + count);
+            System.out.println("Fitness of best gene: " + populationBest.getFitness());
+            System.out.println("Overall best:         " + overallBestGene.getFitness());
         }
 
         population.printPopulation();
+
+
         Gene fittest = population.getFittestGeneNoSort();
         System.out.println("\n\nFinal population fittest gene: " + fittest.toString());
         fittest.printAsGroup();
 
-        System.out.println("\n\nBest gene overall: " + bestGene.toString());
-        bestGene.printAsGroup();
+        System.out.println("\n\nBest gene overall: " + overallBestGene.toString());
+        overallBestGene.printAsGroup();
         System.out.print("From Generation: " + bestGeneration);
+    }
+
+    public static void main(String[] args) {
+        run();
     }
 }

@@ -4,6 +4,7 @@ import model.Person;
 import utils.GeneComparator;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class Population {
 
@@ -30,7 +31,7 @@ public class Population {
      * @param aggregate Array of Ids of Persons to group together.
      * @param distribute Array of Ids of Persons to separate.
      */
-    public static Population initialise(int geneLength, int geneCount, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
+    public static Population initialise(int geneLength, int geneCount, int groupNo, List<Person> customGene, int[] aggregate, int[] distribute) {
         Gene.setBaseInfo(geneLength, groupNo, customGene, aggregate, distribute);
         return new Population(geneLength, geneCount);
     }
@@ -83,12 +84,5 @@ public class Population {
             System.out.println("Fitness = " + curr.getFitness());
         }
         System.out.print("Total Fitness = " + getTotalFitness() + "\n");
-    }
-
-    /**
-     * Only print total fitness of current population.
-     */
-    public void printTotalFitness() {
-        System.out.print("Total Fitness: " + getTotalFitness() + "\n");
     }
 }

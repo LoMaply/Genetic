@@ -10,38 +10,30 @@ The following are some settings for the algorithm as detailed in the paper under
 - Crossover Operator Probability = 0.9
 - Mutation Operator Probability = 0.09
 
+## Dependencies
+
+This project uses Apache Poi 5.2.3 20220909 to read in data from `src\data\userdata.xlsx`, where user data from our test questionnaire is stored and filtered.
 
 # Usage
 
 ### Modifying settings
 
-Simply run `Main`. Several settings to take note of below:
+Simply run `Main.ts`. Several settings to take note of below:
 
 There are 2 main classes where the user can change the algorithm settings by modifying the values of the class variables as follows:
 1. Weight.java - Allows user to modify the weights of various groups, which impacts the calculated Fitness of a particular Gene.
 2. Main.java - Allows user to modify the various probability chances, generation count, population count, gene size etc.
 
-### Fitness Limit
+To edit whether each characteristic should be considered as a Heterogeneous or Homogeneous characteristic in calculating fitness, both the excel file and the `Weight.ts` class should be changed accordingly.
+All item in both the `heteroWeights` and `homoWeights` arrays in `Weight.ts` should follow the ordering of the headers in the `Hetero` and `Homo` sheets in the excel file respectively at all times.
 
-When the algorithm is first run on a new set of data/settings, first set the `FITNESS_LIMIT` in Main.java to a high value. This is due to the behaviour of the algorithm where throughout each generation, Population Fitness increases to a maximum before decreasing slightly and staying at a roughly even level.
-
-As such, `FITNESS_LIMIT` is here to simply help capture the state of the Population at this peak Fitness based on observation of initial results.
-The reference paper seems to allude to this behaviour briefly on pg 220 where during testing with other algorithms, both `POPULATION_SIZE` and `GENERATION_COUNT` had to be fined tuned.
-
-### Custom Gene
-
-Go to line 69. This is where the Population is initialised using the various user defined settings.
-
-Arguments 1, 2 and 3 should be modified from the class variables at the top of the Main class.
-
-The 4th argument can take in 2 possible values:
-1. `null`, which causes the algorithm to be run on a Gene of randomly generated Person objects. These randomly generated objects will not have any preferences.
-2. `createCustomGene()`, which causes the algorithm to run on a Gene of user created Person objects. This allows for testing on the same data. Ensure that every index of the custom gene contains a Person, and that the length of the custom gene == `GENE_LENGTH`.
 
 ### Aggregation/Distribution
 
-The 5th and 6th argument are int arrays taking in a variable list of Person IDs and represent Person objects that ought to be grouped together, or separated, respectively.
-1. For instance, putting `1` and `11` in the 5th argument means that Genes where `Person 1` and `Person 11` are in the same group will be considered fitter (depending on the value of `WEIGHT_DISTRIBUTION` in the Weight class)
+In the 2nd line of the `run()` function in `Main.ts`, the population is first initialised with the user data from the excel as well as the settings.
+
+The 5th and 6th argument of this function are int arrays taking in a variable list of Person IDs and represent Person objects that ought to be grouped together, or separated, respectively.
+1. For instance, putting `1` and `11` in the 5th argument means that Genes where `Person 1` and `Person 11` are grouped together will be considered fitter (depending on the value of `WEIGHT_DISTRIBUTION` in the Weight class)
 2. On the other hand, putting `0` and `16` in the 6th argument means that Genes where `Person 0` and `Person 16` are in different groups will be considered fitter (also depending on the value of `WEIGHT_DISTRIBUTION` in the Weight class)
 3. Ensure that the integers input into these arrays are never >= `GENE_LENGTH`. (Person IDs are zero-indexed by default).
 4. For any 2 Person IDs, they should not simultaneously be in both int arrays at the same time. (Logically speaking, 2 individuals cannot be grouped together AND separated at the same time)
@@ -94,11 +86,10 @@ Based on the paper
 1. Swap mutation is carried out by a probability, which swaps the position of 2 randomly selected indexes in a gene.
 2. Invert mutation on the other hand inverts a subsection of the gene. However, the result of this is accepted ONLY IF the result is fitter than the input.
 
-The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not. This has the side effect where after sufficient iterations of the algorithm, Fitness seems to decrease and stabilize after reaching its peak fitness. However, this stabilized fitness is often still more than the initial population fitness.
+The paper does not specify whether Swap mutation has the same `result fitter than input` condition as the Invert mutation, for now I will assume that it does not.
 
-The temporary solution for this is to introduce a `FITNESS_LIMIT` variable that stops the algorithm when a certain fitness threshold is met, as only the data of the final Population is written to the console.
+This has the side effect where the total population fitness varies up/down, however it has no effect on the overall fittest gene found.
 
-Paper also doesn't specify whether Invert mutation occurs on a probability, but this is assumed to be yes.
 
 ## Issue 3
 
@@ -106,4 +97,4 @@ Not so much an issue with the paper, but a note on the current implementation of
 
 The paper uses a 1 - 5 normalized scale to calculate `fPref`.
 
-In the current implementation, a `Person A` has an integer array containing the IDs of other people `Person A` prefers to be grouped with. All these people will be assigned the value `1`, while all other people are assigned `0` when it comes to calculating `fPref` with respect to `Person A`.
+For the sake of simplicity in the current implementation, for a person `A`, anyone `A` prefers to be grouped with will be given a value of 1 and everyone else 0.
