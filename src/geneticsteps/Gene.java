@@ -85,21 +85,13 @@ public class Gene {
 
         // Store index of 1st member of each group in groupIndex (for group based calculations).
         groupIndex = new int[groupNo];
-        int index = 0;
-        int standard = geneLength / groupNo;
-        if (geneLength % groupNo == 0) { // No remainder
-            for (int i = 0; i < groupNo; i++) {
-                groupIndex[i] = index;
-                index += standard;
-            }
-        } else { // Remainder split evenly to groups starting from back
-            int zp = groupNo - (geneLength % groupNo);
-            for (int i = 0; i < groupNo; i++) {
-                groupIndex[i] = index;
-                index += standard;
-                if (i >= zp) {
-                    index++;
-                }
+        for (int i = 0; i < groupNo; i++) {
+            int remainder = geneLength % groupNo;
+            int standard = Math.floorDiv(geneLength, groupNo);
+            if (i < groupNo - remainder) {
+                groupIndex[i] = i * standard;
+            } else {
+                groupIndex[i] = i * standard + (i - (groupNo - remainder));
             }
         }
     }
@@ -145,9 +137,8 @@ public class Gene {
             }
 
             // For fBal.
-
-            double[] groupMeanHetero = new double[Weight.HETERO_TOTAL_COUNT];
-            double[] groupMeanHomo = new double[Weight.HOMO_TOTAL_COUNT];
+            double[] groupMeanHetero = new double[Weight.HETERO_TOTAL_COUNT]; // Mean of each hetero characteristic for current group
+            double[] groupMeanHomo = new double[Weight.HOMO_TOTAL_COUNT]; // Same but for homo characteristic
 
             // Calculate mean char of all members of current group.
             for (int j = firstMem; j <= lastMem; j++) {

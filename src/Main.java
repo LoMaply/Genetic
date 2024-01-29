@@ -1,28 +1,29 @@
-import model.Weight;
-import org.apache.poi.ss.usermodel.*;
-
 import java.io.FileInputStream;
-
-import geneticsteps.Crossover;
-import geneticsteps.Stochastic;
-import geneticsteps.Gene;
-import geneticsteps.Population;
-import model.Person;
-import org.apache.poi.xssf.usermodel.XSSFWorkbook;
-import utils.Pair;
-
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Random;
+import org.apache.poi.ss.usermodel.Cell;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
+
+import geneticsteps.Crossover;
+import geneticsteps.Gene;
+import geneticsteps.Population;
+import geneticsteps.Stochastic;
+import model.Person;
+import model.Weight;
+import utils.Pair;
+
 
 public class Main {
 
     public static String FILE_LOCATION = "src\\data\\userdata.xlsx";
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
     public static int GENE_LENGTH = 36; // No. of Person objects in each gene.
-    public static int GROUP_NUMBER = 7; // No. of equal sized groups to split Person objects into.
-    public static int GENERATION_COUNT = 100; // Max no. of generations to run.
+    public static int GROUP_NUMBER = 9; // No. of equal sized groups to split Person objects into.
+    public static int GENERATION_COUNT = 500; // Max no. of generations to run.
     public static double GENERATION_GAP = 0.9; // Ratio of children to parents in next generation, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -102,7 +103,7 @@ public class Main {
 
             // Stochastic Universal Sampling
             // No. of selected parents = OFFSPRING_COUNT, Every parent pair produces 2 children.
-            List<Gene> selectedGenes = Stochastic.selectGenes(population, OFFSPRING_COUNT);
+            List<Gene> selectedGenes = Stochastic.selectGenesTest(population, OFFSPRING_COUNT);
             Collections.shuffle(selectedGenes);
 
             // Used as upper bound when generating random integer to select 2 random points in a gene for Crossover and Mutation Operation
@@ -134,7 +135,6 @@ public class Main {
             childrenPopulation.addAll(selectedGenes);
             population.updateGenes(childrenPopulation);
 
-
             // Get fittest gene of population
             Gene populationBest = population.getFittestGeneNoSort();
 
@@ -145,7 +145,6 @@ public class Main {
             }
             count++;
 
-
             // Printing outputs after each generation
             System.out.println("Generation: " + count);
             System.out.println("Fitness of best gene: " + populationBest.getFitness());
@@ -153,8 +152,7 @@ public class Main {
         }
 
         population.printPopulation();
-
-
+        
         Gene fittest = population.getFittestGeneNoSort();
         System.out.println("\n\nFinal population fittest gene: " + fittest.toString());
         fittest.printAsGroup();

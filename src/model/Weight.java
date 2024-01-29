@@ -42,7 +42,7 @@ public class Weight {
 
     // Weights of F values for calculating overall fitness.
     // Weights of fHetero and fHomo (specifically used in calculating fMix). Total should be 1.
-    public static final double WEIGHT_HETEROGENEOUS = 0.5;
+    public static final double WEIGHT_HETEROGENEOUS = 0.3;
     public static final double WEIGHT_HOMOGENEOUS = 1 - WEIGHT_HETEROGENEOUS;
 
     // Weights of fMix, fBal, fDist and fPref
