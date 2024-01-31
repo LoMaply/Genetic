@@ -95,9 +95,6 @@ public class Main {
         population.printPopulation();
         System.out.println("\n");
 
-        Gene overallBestGene = population.getFittestGeneNoSort();
-        int bestGeneration = 0;
-
         int count = 0;
         while (count < GENERATION_COUNT) {
 
@@ -135,31 +132,19 @@ public class Main {
             childrenPopulation.addAll(selectedGenes);
             population.updateGenes(childrenPopulation);
 
-            // Get fittest gene of population
-            Gene populationBest = population.getFittestGeneNoSort();
-
-            // Update overall bestGene and corresponding generation
-            if (populationBest.getFitness() > overallBestGene.getFitness()) {
-                overallBestGene = populationBest;
-                bestGeneration = count;
-            }
             count++;
 
             // Printing outputs after each generation
+            Gene populationBest = population.getFittestGenes(1).get(0);
             System.out.println("Generation: " + count);
             System.out.println("Fitness of best gene: " + populationBest.getFitness());
-            System.out.println("Overall best:         " + overallBestGene.getFitness());
         }
 
         population.printPopulation();
         
-        Gene fittest = population.getFittestGeneNoSort();
+        Gene fittest = population.getFittestGenes(1).get(0);
         System.out.println("\n\nFinal population fittest gene: " + fittest.toString());
         fittest.printAsGroup();
-
-        System.out.println("\n\nBest gene overall: " + overallBestGene.toString());
-        overallBestGene.printAsGroup();
-        System.out.print("From Generation: " + bestGeneration);
     }
 
     public static void main(String[] args) {

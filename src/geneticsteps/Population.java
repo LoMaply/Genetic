@@ -59,13 +59,6 @@ public class Population {
     }
 
     /**
-     * Return only the fittest gene without modifying the original list.
-     */
-    public Gene getFittestGeneNoSort() {
-        return genes.stream().min(new GeneComparator()).orElse(null);
-    }
-
-    /**
      * Updates population with new set of genes (for new generations).
      */
     public void updateGenes(ArrayList<Gene> genes) {
