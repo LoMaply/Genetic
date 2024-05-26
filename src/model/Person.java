@@ -14,12 +14,14 @@ public class Person {
     private final List<Integer> preferences; // List of id's of other people current Person object prefers to be matched with.
     private final double[] heterogeneous;
     private final double[] homogeneous;
+    private final double[] feedback;
 
-    public Person(int[] pref, double[] hetero, double[] homo) {
+    public Person(int[] pref, double[] hetero, double[] homo, double[] feedback) {
         this.id = global++;
         this.preferences = Arrays.stream(pref).boxed().collect(Collectors.toList());
         this.heterogeneous = hetero;
         this.homogeneous = homo;
+        this.feedback = feedback;
     }
 
     @Override
@@ -45,7 +47,18 @@ public class Person {
         for (int i = 0; i < Weight.HOMO_TOTAL_COUNT; i++) {
             similaritySum += Weight.homoWeights[i] * Math.abs(pair1.homogeneous[i] - pair2.homogeneous[i]);
         }
-        return similaritySum / Weight.homoWeightSum;
+        // Edited here for feedback (TEST)
+        similaritySum += Weight.COHESIVENESS * Person.getCohesiveness(pair1, pair2);
+        return similaritySum / (Weight.homoWeightSum + Weight.COHESIVENESS);
+    }
+
+    /**
+     * Maps feedback give/receive between 2 people and returns a lower value if they are move cohesive
+     */
+    public static double getCohesiveness(Person pair1, Person pair2) {
+        int forwardRelation = pair1.feedback[0] == pair2.feedback[1] ? 0 : 1;
+        int backwardRelation = pair2.feedback[0] == pair1.feedback[1] ? 0 : 1;
+        return forwardRelation + backwardRelation / 2.0;
     }
 
     /**

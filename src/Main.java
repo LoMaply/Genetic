@@ -22,8 +22,8 @@ public class Main {
     public static String FILE_LOCATION = "src\\data\\userdata.xlsx";
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
     public static int GENE_LENGTH = 36; // No. of Person objects in each gene.
-    public static int GROUP_NUMBER = 9; // No. of equal sized groups to split Person objects into.
-    public static int GENERATION_COUNT = 500; // Max no. of generations to run.
+    public static int GROUP_NUMBER = 5; // No. of equal sized groups to split Person objects into.
+    public static int GENERATION_COUNT = 300; // Max no. of generations to run.
     public static double GENERATION_GAP = 0.9; // Ratio of children to parents in next generation, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -51,15 +51,21 @@ public class Main {
             Sheet heteroData = workbook.getSheetAt(1);
             Sheet homoData = workbook.getSheetAt(2);
 
+            Sheet feedbackData = workbook.getSheetAt(3);
+
             // Ignore headers from excel files
             for (int i = 1; i < GENE_LENGTH + 1; i++) {
                 Row hetero = heteroData.getRow(i);
                 Row homo = homoData.getRow(i);
 
+                Row feedback = feedbackData.getRow(i);
+
                 double[] heteroChars = convertRowToDoubleArray(hetero, Weight.HETERO_TOTAL_COUNT);
                 double[] homoChars = convertRowToDoubleArray(homo, Weight.HOMO_TOTAL_COUNT);
 
-                Person person = new Person(new int[]{}, heteroChars, homoChars);
+                double[] feedGiveReceive = convertRowToDoubleArray(feedback, 2);
+
+                Person person = new Person(new int[]{}, heteroChars, homoChars, feedGiveReceive);
                 custom.add(person);
             }
             file.close();

@@ -30,6 +30,11 @@ public class Weight {
     public static final double PROJECT_PREF = 1;
     public static final double EXPLORE = 1;
 
+
+    // Weight of feedback give/receive cohesiveness. (TEST)
+    public static final double COHESIVENESS = 1;
+
+
     // Weights of characteristics stored in array.
     // No of items in each array determines length of hetero/homo arrays in Person object.
     public static double[] heteroWeights = new double[]{ GENDER, ADAPTABILITY, COMMS_STYLE_PREF, COMMS_INITIATE_COMFORT, COMMS_INITIATE_FREQ, MANAGE_MISTAKE, MANAGE_CONFLICT };
