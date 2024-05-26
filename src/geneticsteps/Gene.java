@@ -60,7 +60,7 @@ public class Gene {
         // Set baseGene used to generate initial population.
         baseGene = customGene;
 
-        // Store Ids of aggregated/distributed Persons into respective HashSet (for calculating fDist).
+        // Store Ids of aggregated/distributed Persons into respective HashSet (to calculate fDist).
         for (int person : aggregate) {
             aggregatedPersons.add(person);
         }
@@ -68,7 +68,7 @@ public class Gene {
             distributedPersons.add(person);
         }
 
-        // Store total mean of each characteristic individually (for calculating fBal).
+        // Store mean of each characteristic of entire gene (to calculate fBal).
         meanHetero = new double[Weight.HETERO_TOTAL_COUNT];
         meanHomo = new double[Weight.HOMO_TOTAL_COUNT];
 
@@ -83,7 +83,7 @@ public class Gene {
             }
         });
 
-        // Store index of 1st member of each group in groupIndex (for group based calculations).
+        // Store index of 1st member of each group in groupIndex (to enable group based calculations).
         groupIndex = new int[groupNo];
         for (int i = 0; i < groupNo; i++) {
             int remainder = geneLength % groupNo;
@@ -244,7 +244,7 @@ public class Gene {
     }
 
     /**
-     * Prints gene where all elements are in their respective groups (denoted by a new line).
+     * Prints gene where all Persons are sorted into their respective groups (denoted by a new line).
      */
     public void printAsGroup() {
         System.out.println("Fitness: " + this.fitness);

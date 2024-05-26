@@ -20,7 +20,7 @@ public class Weight {
     // Weight of Homogeneous characteristics.
     public static final double BIRD_OWL = 1; // Early bird or night owl
     public static final double MEETING_TIME = 1; // Morning/Evening meeting
-    public static final double DOER_PLANNER = 1;
+    public static final double DOER_PLANNER = 1 ;
     public static final double MANAGE_DEADLINE = 1;
     public static final double WORK_CONSISTENCY = 1;
     public static final double WORK_COMMITMENT = 1;

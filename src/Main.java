@@ -30,7 +30,7 @@ public class Main {
     public static double MUTATION_PROBABILITY = 0.09; // Chance of applying either mutation operations.
 
     /**
-     * Calculates no. of offspring to generate based on POPULATION_SIZE & GENERATION_GAP, that is a multiple of 2.
+     * Calculates no. of offspring to generate based on POPULATION_SIZE & GENERATION_GAP, ensuring it is a multiple of 2.
      */
     public static int getOffspringCount() {
         int count = (int) (POPULATION_SIZE * GENERATION_GAP);
@@ -51,7 +51,7 @@ public class Main {
             Sheet heteroData = workbook.getSheetAt(1);
             Sheet homoData = workbook.getSheetAt(2);
 
-            // Ignore headers from excel files
+            // i == 1 to ignore headers from excel files
             for (int i = 1; i < GENE_LENGTH + 1; i++) {
                 Row hetero = heteroData.getRow(i);
                 Row homo = homoData.getRow(i);
@@ -71,7 +71,7 @@ public class Main {
     }
 
     /**
-     * Converts row of excel data into double array.
+     * Converts each row of excel data into double array.
      */
     private static double[] convertRowToDoubleArray(Row row, int columnCount) {
         double[] data = new double[columnCount];
@@ -103,7 +103,7 @@ public class Main {
             List<Gene> selectedGenes = Stochastic.selectGenesTest(population, OFFSPRING_COUNT);
             Collections.shuffle(selectedGenes);
 
-            // Used as upper bound when generating random integer to select 2 random points in a gene for Crossover and Mutation Operation
+            // Used as upper bound when generating random integers to select 2 random points in a gene for Crossover and Mutation Operation
             int limit = GENE_LENGTH - 1;
 
             // Crossover Operation
@@ -127,7 +127,7 @@ public class Main {
                 }
             }
 
-            // Elitism (Create new population using children + fittest parents)
+            // Elitism (Create new generation using children + fittest parents)
             ArrayList<Gene> childrenPopulation = population.getFittestGenes(POPULATION_SIZE - OFFSPRING_COUNT);
             childrenPopulation.addAll(selectedGenes);
             population.updateGenes(childrenPopulation);
