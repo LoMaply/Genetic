@@ -51,8 +51,8 @@ public class Weight {
     public static final double WEIGHT_HOMOGENEOUS = 1 - WEIGHT_HETEROGENEOUS;
 
     // Weights of fMix, fBal, fDist and fPref
-    public static final double WEIGHT_MIX = 2;
-    public static final double WEIGHT_BALANCE = 2;
+    public static final double WEIGHT_MIX = 1;
+    public static final double WEIGHT_BALANCE = 1;
     public static final double WEIGHT_DISTRIBUTION = 0;
     public static final double WEIGHT_PREFERENCE = 0;
     public static final double F_TOTAL_WEIGHT = WEIGHT_MIX + WEIGHT_BALANCE + WEIGHT_DISTRIBUTION + WEIGHT_PREFERENCE;

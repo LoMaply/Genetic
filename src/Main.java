@@ -23,7 +23,7 @@ public class Main {
     public static int POPULATION_SIZE = 50; // No. of genes in each population.
     public static int GENE_LENGTH = 36; // No. of Person objects in each gene.
     public static int GROUP_NUMBER = 5; // No. of equal sized groups to split Person objects into.
-    public static int GENERATION_COUNT = 300; // Max no. of generations to run.
+    public static int GENERATION_COUNT = 500; // Max no. of generations to run.
     public static double GENERATION_GAP = 0.9; // Ratio of children to parents in next generation, must be 0 < x < 1. POPULATION_SIZE * GENERATION_GAP = no. of child genes needed. Remaining space is saved for fittest parents.
     public static int OFFSPRING_COUNT = getOffspringCount(); // No. of offspring, must be multiple of 2.
     public static double CROSSOVER_PROBABILITY = 0.9; // Chance of crossover operation.
@@ -41,9 +41,10 @@ public class Main {
      * Reads and convert user data from excel into Person objects.
      * @return Custom user defined gene.
      */
-    public static List<Person> createCustomGene() {
+    public static Person[] createCustomGene() {
 
-        List<Person> custom = new ArrayList<>(GENE_LENGTH);
+        // List<Person> custom = new ArrayList<>(GENE_LENGTH);
+        Person[] custom = new Person[GENE_LENGTH];
 
         try {
             FileInputStream file = new FileInputStream(FILE_LOCATION);
@@ -65,7 +66,8 @@ public class Main {
                 double[] feedGiveReceive = convertRowToDoubleArray(feedback, 2);
 
                 Person person = new Person(new int[]{}, heteroChars, homoChars, feedGiveReceive);
-                custom.add(person);
+                //Person person = new Person(new int[]{}, new double[]{1}, new double[]{1}, feedGiveReceive);
+                custom[i - 1] = person;
             }
             file.close();
         } catch (Exception e) {
@@ -143,6 +145,7 @@ public class Main {
             Gene populationBest = population.getFittestGenes(1).get(0);
             System.out.println("Generation: " + count);
             System.out.println("Fitness of best gene: " + populationBest.getFitness());
+            populationBest.printAsGroup();
         }
 
         population.printPopulation();

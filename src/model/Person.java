@@ -14,7 +14,7 @@ public class Person {
     private final List<Integer> preferences; // List of id's of other people current Person object prefers to be matched with.
     private final double[] heterogeneous;
     private final double[] homogeneous;
-    private final double[] feedback;
+    private final double[] feedback; // For feedback questions only
 
     public Person(int[] pref, double[] hetero, double[] homo, double[] feedback) {
         this.id = global++;
@@ -53,13 +53,15 @@ public class Person {
     }
 
     /**
-     * Maps feedback give/receive between 2 people and returns a lower value if they are move cohesive
+     * Maps feedback give/receive between 2 people and returns a lower value if they are more cohesive
      */
     public static double getCohesiveness(Person pair1, Person pair2) {
         int forwardRelation = pair1.feedback[0] == pair2.feedback[1] ? 0 : 1;
         int backwardRelation = pair2.feedback[0] == pair1.feedback[1] ? 0 : 1;
-        return forwardRelation + backwardRelation / 2.0;
+        int sum = forwardRelation + backwardRelation;
+        return sum / 2.0;
     }
+
 
     /**
      * Calculates difference for {@param pair1} and {@param pair2} based on Homogeneous characteristics for fHomo.

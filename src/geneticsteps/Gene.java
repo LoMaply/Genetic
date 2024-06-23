@@ -15,9 +15,12 @@ import java.util.stream.Collectors;
 public class Gene {
 
     // Class fields to be set before genetic algorithm can proceed.
-    private static List<Person> baseGene;
+    private static Person[] baseGene;
     private static double[] meanHetero; // Mean of each heterogeneous characteristic of all Persons in gene.
     private static double[] meanHomo; // Mean of each homogeneous characteristic of all Persons in gene.
+
+    private static double meanCohesion; // Mean value of cohesiveness (feedback qns) for every possible pair in gene
+
     private static int[] groupIndex; // Starting index of each group in gene.
     public static HashSet<Integer> aggregatedPersons = new HashSet<>(); // Ids of Persons to be grouped together.
     public static HashSet<Integer> distributedPersons = new HashSet<>(); // Ids of Persons to be separated.
@@ -49,13 +52,13 @@ public class Gene {
     /**
      * Creates base array of Person objects, to be used for generating random permutations for initial population.
      * Stores information related to baseGene, useful for some calculations.
-     * @param geneLength No. of Person objects to randomly generate OR length of non-null {@param customGene}.
+     * @param geneLength No. of Person objects.
      * @param groupNo No. of equal sized groups to form.
      * @param customGene List of Person objects.
      * @param aggregate Array of Ids of Persons to group together.
      * @param distribute Array of Ids of Persons to separate.
      */
-    public static void setBaseInfo(int geneLength, int groupNo, List<Person> customGene, int[] aggregate, int[] distribute) {
+    public static void setBaseInfo(int geneLength, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
 
         // Set baseGene used to generate initial population.
         baseGene = customGene;
@@ -71,7 +74,28 @@ public class Gene {
         // Store mean of each characteristic of entire gene (to calculate fBal).
         meanHetero = new double[Weight.HETERO_TOTAL_COUNT];
         meanHomo = new double[Weight.HOMO_TOTAL_COUNT];
+        int pairCount = 0;
 
+        for (int i = 0; i < geneLength; i++) {
+            double[] hetero = baseGene[i].getHeterogeneous();
+            double[] homo = baseGene[i].getHomogeneous();
+            for (int j = 0; j < Weight.HETERO_TOTAL_COUNT; j++) {
+                meanHetero[j] += (hetero[j] / geneLength);
+            }
+            for (int j = 0; j < Weight.HOMO_TOTAL_COUNT; j++) {
+                meanHomo[j] += (homo[j] / geneLength);
+            }
+
+            // For feedback qns
+            for (int j = i + 1; j < geneLength; j++) {
+                pairCount++;
+                double value = Person.getCohesiveness(baseGene[i], baseGene[j]);
+                meanCohesion += value;
+            }
+        }
+        meanCohesion /= pairCount;
+
+        /*
         baseGene.forEach(x -> {
             double[] hetero = x.getHeterogeneous();
             double[] homo = x.getHomogeneous();
@@ -82,6 +106,7 @@ public class Gene {
                 meanHomo[i] += (homo[i] / geneLength);
             }
         });
+        */
 
         // Store index of 1st member of each group in groupIndex (to enable group based calculations).
         groupIndex = new int[groupNo];
@@ -100,8 +125,9 @@ public class Gene {
      * Returns a random permutation of baseGene for generating initial population.
      */
     public static Person[] getShuffledBase() {
-        Collections.shuffle(baseGene);
-        return baseGene.toArray(Person[]::new);
+        List<Person> personList = Arrays.asList(baseGene);
+        Collections.shuffle(personList);
+        return personList.toArray(Person[]::new);
     }
 
     /**
@@ -115,6 +141,8 @@ public class Gene {
         double fBal = 0;
         double fPref = 0;
         double fDist = 0;
+
+        //System.out.println("Mean cohesion: " + meanCohesion);
 
         // For each group.
         for (int i = 0; i < groupIndex.length; i++) {
@@ -140,6 +168,9 @@ public class Gene {
             double[] groupMeanHetero = new double[Weight.HETERO_TOTAL_COUNT]; // Mean of each hetero characteristic for current group
             double[] groupMeanHomo = new double[Weight.HOMO_TOTAL_COUNT]; // Same but for homo characteristic
 
+            double groupMeanCohesion = 0; // For feedback qns
+            int pairCount = 0;
+
             // Calculate mean char of all members of current group.
             for (int j = firstMem; j <= lastMem; j++) {
                 double[] hetero = gene[j].getHeterogeneous();
@@ -151,7 +182,15 @@ public class Gene {
                 for (int k = 0; k < Weight.HOMO_TOTAL_COUNT; k++) {
                     groupMeanHomo[k] += (homo[k] / gene.length);
                 }
+
+                // For feedback qns
+                for (int k = j + 1; k <= lastMem; k++) {
+                    pairCount++;
+                    groupMeanCohesion += Person.getCohesiveness(gene[j], gene[k]);
+                }
             }
+            groupMeanCohesion /= pairCount;
+
             // Summing up for fBal.
             for (int j = 0; j < Weight.HETERO_TOTAL_COUNT; j++) {
                 fBal += Math.pow(groupMeanHetero[j] - meanHetero[j], 2);
@@ -159,10 +198,12 @@ public class Gene {
             for (int j = 0; j < Weight.HOMO_TOTAL_COUNT; j++) {
                 fBal += Math.pow(groupMeanHomo[j] - meanHomo[j], 2);
             }
+
+            // For feedback qns
+            fBal += Math.pow(groupMeanCohesion - meanCohesion, 2);
         }
 
         double fMix = fHetero * Weight.WEIGHT_HETEROGENEOUS + fHomo * Weight.WEIGHT_HOMOGENEOUS;
-
         // Fitness = 1 / F, hence the inversion of numerator & denominator.
         return Weight.F_TOTAL_WEIGHT / (fMix * Weight.WEIGHT_MIX + fBal * Weight.WEIGHT_BALANCE + fPref * Weight.WEIGHT_PREFERENCE + fDist * Weight.WEIGHT_DISTRIBUTION);
     }
@@ -200,10 +241,12 @@ public class Gene {
      * Performs swap mutation using randomly generated indexes {@param start} and {@param end}.
      */
     public Gene mutateSwap(int random1, int random2) {
-        Person temp = gene[random1];
-        gene[random1] = gene[random2];
-        gene[random2] = temp;
-        return this;
+        Person[] result = Arrays.copyOf(this.gene, this.length);
+
+        Person temp = result[random1];
+        result[random1] = result[random2];
+        result[random2] = temp;
+        return new Gene(result, this.length, Gene.calculateFitness(result));
     }
 
     /**

@@ -4,7 +4,6 @@ import model.Person;
 import utils.GeneComparator;
 
 import java.util.ArrayList;
-import java.util.List;
 
 public class Population {
 
@@ -24,14 +23,14 @@ public class Population {
 
     /**
      * Creates a base gene and generates initial population by randomly permuting it.
-     * @param geneLength Length of gene to be generated. Ignored when {@param customGene} is provided.
+     * @param geneLength Length of gene.
      * @param geneCount No. of genes in Population.
      * @param groupNo No. of equal sized groups to form.
      * @param customGene List of Person objects.
      * @param aggregate Array of Ids of Persons to group together.
      * @param distribute Array of Ids of Persons to separate.
      */
-    public static Population initialise(int geneLength, int geneCount, int groupNo, List<Person> customGene, int[] aggregate, int[] distribute) {
+    public static Population initialise(int geneLength, int geneCount, int groupNo, Person[] customGene, int[] aggregate, int[] distribute) {
         Gene.setBaseInfo(geneLength, groupNo, customGene, aggregate, distribute);
         return new Population(geneLength, geneCount);
     }
